@@ -1,0 +1,20 @@
+{
+  "name": "dst-to-png",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rm -rf ./dst/** ; rm -rf ./out/**",
+    "dev": "npm run clean ; tsc --watch",
+    "test": "ts-node test/dst-to-png.test.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^17.0.41",
+    "glob": "^7.2.0"
+  },
+  "dependencies": {
+    "@s4tk/encoding": "^0.1.3"
+  }
+}
