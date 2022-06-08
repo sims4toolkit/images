@@ -1,11 +1,11 @@
 import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
-import { FourCC, PixelFormatFlag } from "./enums";
+import { FourCC, PixelFormatFlags } from "./enums";
 
-class PixelFormat {
-  static STRUCTURE_SIZE = 32;
+export default class PixelFormat {
+  static readonly STRUCTURE_SIZE = 32;
 
   readonly size = PixelFormat.STRUCTURE_SIZE;
-  pixelFormatFlag: PixelFormatFlag = PixelFormatFlag.FourCC;
+  pixelFormatFlag: PixelFormatFlags = PixelFormatFlags.FourCC;
   fourCC: FourCC = FourCC.DXT5;
   rgbBitCount: number = 0;
   redBitMask: number = 0;
@@ -24,7 +24,7 @@ class PixelFormat {
       throw new Error(`Expected size of ${PixelFormat.STRUCTURE_SIZE}, got ${size}`);
 
     pixelFormat.pixelFormatFlag = decoder.uint32();
-    if (!(pixelFormat.pixelFormatFlag in PixelFormatFlag))
+    if (!(pixelFormat.pixelFormatFlag in PixelFormatFlags))
       throw new Error(`Expected a valid PixelFormatFlag, got ${pixelFormat.pixelFormatFlag}`);
 
     pixelFormat.fourCC = decoder.uint32();
