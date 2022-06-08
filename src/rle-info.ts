@@ -1,6 +1,6 @@
 import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
 import { HeaderFlags, RleVersion } from "./enums";
-import PixelFormat from "./pixel-format";
+import PixelFormat from "./models/pixel-format";
 
 export default class RleInfo {
   static readonly SIGNATURE = 0x20534444;

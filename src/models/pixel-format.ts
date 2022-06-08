@@ -1,5 +1,5 @@
 import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
-import { FourCC, PixelFormatFlags } from "./enums";
+import { FourCC, PixelFormatFlags } from "../enums";
 
 /**
  * DTO for the fields in the pixel format structure.

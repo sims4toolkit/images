@@ -1,6 +1,6 @@
 import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
 import { HeaderFlags, RleVersion } from "../enums";
-import PixelFormat from "../pixel-format";
+import PixelFormat from "./pixel-format";
 
 /**
  * DTO for the fields in the DDS header structure.
@@ -75,6 +75,13 @@ export default class DdsHeader implements DdsHeaderFields {
       throw new Error(`Expected mini map count less than 16, got ${this.mipCount}`);
 
     this.unknown0E = fields?.unknown0E ?? 0;
+  }
+
+  /**
+   * Creates a copy of this DdsHeader object.
+   */
+  clone(): DdsHeader {
+    return new DdsHeader(this);
   }
 
   /**
