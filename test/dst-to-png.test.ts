@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
-import { dstToPng } from "../dst/dst-to-png";
+import { dstToDds, ddsToDst } from "../dst/dst-to-png";
 
-const srcPath = path.resolve(__dirname, path.join("..", "images", "LB.dst"));
-const outPath = path.resolve(__dirname, path.join("..", "out", "LB.png"));
+const srcPath = path.resolve(__dirname, path.join("..", "images", "LB.dds"));
+const outPath = path.resolve(__dirname, path.join("..", "out", "LB.dst")); // should be png
 
-const dstBuffer = fs.readFileSync(srcPath);
-const pngBuffer = dstToPng(dstBuffer);
+const srcBuffer = fs.readFileSync(srcPath);
+const outBuffer = ddsToDst(srcBuffer);
 
-fs.writeFileSync(outPath, pngBuffer);
+fs.writeFileSync(outPath, outBuffer);

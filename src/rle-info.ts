@@ -9,7 +9,7 @@ export default class RleInfo {
 
   // S4PI: (18 * 4) + PixelFormat.STRUCTURE_SIZE + (5 * 4)
   // S4PI length appears to be missing 4 bytes...
-  readonly size: number = PixelFormat.STRUCTURE_SIZE + 96; // FIXME: S4PI uses 92...
+  readonly size: number = PixelFormat.STRUCTURE_SIZE + 92;
   headerFlags: HeaderFlags = HeaderFlags.Texture;
   height: number = 0;
   width: number = 0;

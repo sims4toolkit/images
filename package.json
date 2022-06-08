@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf ./dst/** ; rm -rf ./out/**",
+    "build": "npm run clean ; tsc",
     "dev": "npm run clean ; tsc --watch",
     "test": "ts-node test/dst-to-png.test.ts"
   },

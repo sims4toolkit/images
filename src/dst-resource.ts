@@ -26,14 +26,25 @@ export class DstResource {
       : Buffer.from(this.data);
   }
 
+  toDst(): Buffer {
+    if (this.data == null) return null;
+
+    return !this.isShuffled
+      ? DstResource.shuffle(this.header, this.data)
+      : Buffer.from(this.data);
+  }
+
   static shuffle(header: RleInfo, buffer: Buffer): Buffer {
     const dataOffset = 128;
     const decoder = new BinaryDecoder(buffer);
+    decoder.seek(dataOffset);
     const encoder = BinaryEncoder.alloc(buffer.byteLength);
 
-    if (header.pixelFormat.fourCC === FourCC.DST1) {
-      const headerClone = clone(header);
-      headerClone.pixelFormat.fourCC = FourCC.DXT1;
+    if (header.pixelFormat.fourCC === FourCC.DXT1) {
+      console.log("DXT1");
+
+      const headerClone = header;//clone(header); FIXME: clone
+      headerClone.pixelFormat.fourCC = FourCC.DST1;
       encoder.uint32(RleInfo.SIGNATURE);
       encoder.bytes(headerClone.serialize());
       encoder.seek(dataOffset); // FIXME: necessary?
@@ -50,14 +61,15 @@ export class DstResource {
 
       encoder.bytes(blockEncoder1.buffer);
       encoder.bytes(blockEncoder2.buffer);
-    } else if (header.pixelFormat.fourCC === FourCC.DST3) {
+    } else if (header.pixelFormat.fourCC === FourCC.DXT3) {
       throw new Error("DST3 not supported.");
-    } else if (header.pixelFormat.fourCC === FourCC.DST5) {
-      const headerClone = clone(header);
-      headerClone.pixelFormat.fourCC = FourCC.DXT5;
+    } else if (header.pixelFormat.fourCC === FourCC.DXT5) {
+      console.log("DXT5");
+      const headerClone = header;//clone(header); FIXME: clone
+      headerClone.pixelFormat.fourCC = FourCC.DST5;
       encoder.uint32(RleInfo.SIGNATURE);
       encoder.bytes(headerClone.serialize());
-      encoder.seek(dataOffset); // FIXME: necessary?
+      console.log(encoder.tell());
 
       const count = (buffer.byteLength - dataOffset) / 16;
 
@@ -76,8 +88,10 @@ export class DstResource {
       // order is intentional
       encoder.bytes(blockEncoder1.buffer);
       encoder.bytes(blockEncoder3.buffer);
-      encoder.bytes(blockEncoder2.buffer);
+      encoder.bytes(blockEncoder2.buffer); // FIXME: 3 before 2?
       encoder.bytes(blockEncoder4.buffer);
+    } else {
+      console.log("AHHHH" + FourCC[header.pixelFormat.fourCC]);
     }
 
     return encoder.buffer;
@@ -89,12 +103,12 @@ export class DstResource {
 
     const decoder = new BinaryDecoder(buffer);
     decoder.seek(dataOffset);
-
-    const encoder = BinaryEncoder.alloc(buffer.byteLength); // FIXME: size correct?
     const tempBytes = decoder.bytes(dataSize);
 
+    const encoder = BinaryEncoder.alloc(buffer.byteLength); // FIXME: size correct?
+
     if (header.pixelFormat.fourCC === FourCC.DST1) {
-      const headerClone = clone(header);
+      const headerClone = header;//clone(header); FIXME: clone
       headerClone.pixelFormat.fourCC = FourCC.DXT1;
       encoder.uint32(RleInfo.SIGNATURE); // DDS header
       encoder.bytes(headerClone.serialize());
@@ -113,7 +127,7 @@ export class DstResource {
     } else if (header.pixelFormat.fourCC == FourCC.DST3) {
       throw new Error("DST3/DXT3 not supported.");
     } else if (header.pixelFormat.fourCC == FourCC.DST5) {
-      const headerClone = clone(header);
+      const headerClone = header;//clone(header); FIXME: clone
       headerClone.pixelFormat.fourCC = FourCC.DXT5;
       encoder.uint32(RleInfo.SIGNATURE); // DDS header
       encoder.bytes(headerClone.serialize());
