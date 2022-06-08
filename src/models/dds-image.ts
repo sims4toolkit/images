@@ -42,6 +42,8 @@ export default class DdsImage {
     return new DdsImage(header, buffer);
   }
 
+  //#region Public Methods
+
   /**
    * Creates a deep copy of this DdsImage object.
    */
@@ -69,6 +71,10 @@ export default class DdsImage {
       ? this._shuffle()
       : this.clone();
   }
+
+  //#endregion Public Methods
+
+  //#region Private Methods
 
   /**
    * Returns a shuffled copy of this image. The image's data MUST already be
@@ -187,4 +193,6 @@ export default class DdsImage {
 
     return new DdsImage(headerClone, encoder.buffer);
   }
+
+  //#endregion Private Methods
 }
