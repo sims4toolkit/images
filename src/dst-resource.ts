@@ -1,4 +1,5 @@
 import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
+import clone from "just-clone";
 import { FourCC } from "./enums";
 import RleInfo from "./rle-info";
 
@@ -18,29 +19,20 @@ export class DstResource {
   }
 
   toDds(): Buffer {
-    // TODO: impl
-    // if (this.data == null) return null;
-    // if (!this.isShuffled)
-    // {
-    //     return new MemoryStream(this.data);
-    // }
-    // else
-    // {
-    //     using (MemoryStream ms = new MemoryStream(this.data))
-    //     {
-    //         MemoryStream result = (MemoryStream)Unshuffle(this.header, ms);
-    //         result.Position = 0;
-    //         return result;
-    //     }
-    // }
+    if (this.data == null) return null;
+
+    return this.isShuffled
+      ? DstResource.unshuffle(this.header, this.data)
+      : Buffer.from(this.data);
   }
 
   static shuffle(header: RleInfo, buffer: Buffer): Buffer {
     const dataOffset = 128;
     const decoder = new BinaryDecoder(buffer);
-    const shuffledBuffer = Buffer.alloc(buffer.byteLength);
-    const encoder = new BinaryEncoder(shuffledBuffer);
+    const encoder = BinaryEncoder.alloc(buffer.byteLength);
     encoder.seek(128);
+
+    // FIXME: what does this actually do? how does the header change? what about the first 128 bytes?
 
     if (header.pixelFormat.fourCC === FourCC.DST1) {
       const count = (buffer.byteLength - dataOffset) / 8;
@@ -55,9 +47,9 @@ export class DstResource {
 
       encoder.bytes(blockEncoder1.buffer);
       encoder.bytes(blockEncoder2.buffer);
-    } else if (header.pixelFormat.fourCC == FourCC.DST3) {
+    } else if (header.pixelFormat.fourCC === FourCC.DST3) {
       throw new Error("DST3 not supported.");
-    } else if (header.pixelFormat.fourCC == FourCC.DST5) {
+    } else if (header.pixelFormat.fourCC === FourCC.DST5) {
       const count = (buffer.byteLength - dataOffset) / 16;
 
       const blockEncoder1 = BinaryEncoder.alloc(count * 2);
@@ -79,7 +71,7 @@ export class DstResource {
       encoder.bytes(blockEncoder4.buffer);
     }
 
-    return shuffledBuffer;
+    return encoder.buffer;
   }
 
   static unshuffle(header: RleInfo, buffer: Buffer): Buffer {
@@ -89,70 +81,54 @@ export class DstResource {
     const decoder = new BinaryDecoder(buffer);
     decoder.seek(dataOffset);
 
-    // MemoryStream result = new MemoryStream();
-    // BinaryWriter w = new BinaryWriter(result);
-    // var temp = r.ReadBytes(dataSize);
+    const encoder = BinaryEncoder.alloc(buffer.byteLength); // FIXME: size correct?
+    const tempBytes = decoder.bytes(dataSize);
 
-    // if (header.pixelFormat.Fourcc == FourCC.DST1)
-    // {
-    //     header.pixelFormat.Fourcc = FourCC.DXT1;
-    //     w.Write(0x20534444); // DDS header
-    //     header.UnParse(result);
+    if (header.pixelFormat.fourCC === FourCC.DST1) {
+      const headerClone = clone(header);
+      headerClone.pixelFormat.fourCC = FourCC.DXT1;
+      encoder.uint32(RleInfo.SIGNATURE); // DDS header
+      encoder.bytes(headerClone.serialize());
 
-    //     var blockOffset2 = 0;
-    //     var blockOffset3 = blockOffset2 + (dataSize >> 1);
+      let blockOffset2 = 0;
+      let blockOffset3 = blockOffset2 + (dataSize >> 1);
+      const count = (blockOffset3 - blockOffset2) / 4;
 
-    //     // probably a better way to do this
-    //     var count = (blockOffset3 - blockOffset2) / 4;
+      for (let i = 0; i < count; i++) {
+        encoder.bytes(tempBytes.slice(blockOffset2, blockOffset2 + 4));
+        encoder.bytes(tempBytes.slice(blockOffset3, blockOffset3 + 4));
 
-    //     for (int i = 0; i < count; i++)
-    //     {
-    //         result.Write(temp, blockOffset2, 4);
-    //         result.Write(temp, blockOffset3, 4);
-    //         blockOffset2 += 4;
-    //         blockOffset3 += 4;
-    //     }
-    // }
-    // else if (header.pixelFormat.Fourcc == FourCC.DST3) // DST3
-    // {
-    //     header.pixelFormat.Fourcc = FourCC.DXT3;
-    //     w.Write(0x20534444);
-    //     header.UnParse(result);
+        blockOffset2 += 4;
+        blockOffset3 += 4;
+      }
+    } else if (header.pixelFormat.fourCC == FourCC.DST3) {
+      throw new Error("DST3/DXT3 not supported.");
+    } else if (header.pixelFormat.fourCC == FourCC.DST5) {
+      const headerClone = clone(header);
+      headerClone.pixelFormat.fourCC = FourCC.DXT5;
+      encoder.uint32(RleInfo.SIGNATURE); // DDS header
+      encoder.bytes(headerClone.serialize());
 
-    //     var blockOffset0 = 0;
-    //     var blockOffset2 = blockOffset0 + (dataSize >> 1);
-    //     var blockOffset3 = blockOffset2 + (dataSize >> 2);
+      let blockOffset0 = 0;
+      let blockOffset2 = blockOffset0 + (dataSize >> 3);
+      let blockOffset1 = blockOffset2 + (dataSize >> 2);
+      let blockOffset3 = blockOffset1 + (6 * dataSize >> 4);
 
-    //     throw new NotImplementedException("no samples");
-    // }
-    // else if (header.pixelFormat.Fourcc ==  FourCC.DST5) // DST5
-    // {
-    //     header.pixelFormat.Fourcc = FourCC.DXT5;
-    //     w.Write(0x20534444);
-    //     header.UnParse(result);
+      const count = (blockOffset2 - blockOffset0) / 2;
 
-    //     var blockOffset0 = 0;
-    //     var blockOffset2 = blockOffset0 + (dataSize >> 3);
-    //     var blockOffset1 = blockOffset2 + (dataSize >> 2);
-    //     var blockOffset3 = blockOffset1 + (6 * dataSize >> 4);
+      for (let i = 0; i < count; i++) {
+        encoder.bytes(tempBytes.slice(blockOffset0, blockOffset0 + 2));
+        encoder.bytes(tempBytes.slice(blockOffset1, blockOffset1 + 6));
+        encoder.bytes(tempBytes.slice(blockOffset2, blockOffset2 + 4));
+        encoder.bytes(tempBytes.slice(blockOffset3, blockOffset3 + 4));
 
-    //     // probably a better way to do this
-    //     var count = (blockOffset2 - blockOffset0) / 2;
+        blockOffset0 += 2;
+        blockOffset1 += 6;
+        blockOffset2 += 4;
+        blockOffset3 += 4;
+      }
+    }
 
-    //     for (int i = 0; i < count; i++)
-    //     {
-    //         result.Write(temp, blockOffset0, 2);
-    //         result.Write(temp, blockOffset1, 6);
-    //         result.Write(temp, blockOffset2, 4);
-    //         result.Write(temp, blockOffset3, 4);
-
-    //         blockOffset0 += 2;
-    //         blockOffset1 += 6;
-    //         blockOffset2 += 4;
-    //         blockOffset3 += 4;
-    //     }
-    // }
-    // result.Position = 0;
-    // return result;
+    return encoder.buffer;
   }
 }

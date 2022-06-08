@@ -15,6 +15,7 @@
     "glob": "^7.2.0"
   },
   "dependencies": {
-    "@s4tk/encoding": "^0.1.4"
+    "@s4tk/encoding": "^0.1.4",
+    "just-clone": "^6.0.1"
   }
 }
