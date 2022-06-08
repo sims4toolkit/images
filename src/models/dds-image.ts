@@ -3,7 +3,8 @@ import { FourCC } from "../enums";
 import DdsHeader from "./dds-header";
 
 /**
- * TODO:
+ * Model for a DDS images, which may be in DXT (unsuhffled) or DST (shuffled)
+ * formats.
  */
 export default class DdsImage {
   static readonly SIGNATURE = 0x20534444;
@@ -25,16 +26,6 @@ export default class DdsImage {
   ) { }
 
   /**
-   * Creates a deep copy of this DdsImage object.
-   */
-  clone(): DdsImage {
-    return new DdsImage(
-      this.header.clone(),
-      Buffer.from(this.buffer)
-    );
-  }
-
-  /**
    * Reads a DdsImage object from the given buffer. 
    * 
    * @param buffer Buffer to read data from
@@ -49,6 +40,34 @@ export default class DdsImage {
     const header = DdsHeader.from(decoder.slice(DdsHeader.STRUCTURE_SIZE));
 
     return new DdsImage(header, buffer);
+  }
+
+  /**
+   * Creates a deep copy of this DdsImage object.
+   */
+  clone(): DdsImage {
+    return new DdsImage(
+      this.header.clone(),
+      Buffer.from(this.buffer)
+    );
+  }
+
+  /**
+   * Returns a deep copy of this image, guaranteed to be in a DXT format.
+   */
+  toUnshuffled(): DdsImage {
+    return this.isShuffled
+      ? this._unshuffle()
+      : this.clone();
+  }
+
+  /**
+   * Returns a deep copy of this image, guaranteed to be in a DST format.
+   */
+  toShuffled(): DdsImage {
+    return !this.isShuffled
+      ? this._shuffle()
+      : this.clone();
   }
 
   /**
