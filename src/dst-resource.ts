@@ -36,66 +36,58 @@ export class DstResource {
   }
 
   static shuffle(header: RleInfo, buffer: Buffer): Buffer {
+    const dataOffset = 128;
     const decoder = new BinaryDecoder(buffer);
-
-    const shuffledBuffer = Buffer.alloc(0); // FIXME: number?
+    const shuffledBuffer = Buffer.alloc(buffer.byteLength);
     const encoder = new BinaryEncoder(shuffledBuffer);
     encoder.seek(128);
 
     if (header.pixelFormat.fourCC === FourCC.DST1) {
-      const count = (buffer.byteLength - 128) / 8;
+      const count = (buffer.byteLength - dataOffset) / 8;
 
-      const blockBuffer1 = Buffer.alloc(count * 4);
-      const blockBuffer2 = Buffer.alloc(count * 4);
-
-      const blockEncoder1 = new BinaryEncoder(blockBuffer1);
-      const blockEncoder2 = new BinaryEncoder(blockBuffer2);
+      const blockEncoder1 = BinaryEncoder.alloc(count * 4);
+      const blockEncoder2 = BinaryEncoder.alloc(count * 4);
 
       for (let i = 0; i < count; i++) {
-        // FIXME: add a better way to handle this in binary encoder
-        decoder.bytes(4).forEach(byte => blockEncoder1.uint8(byte));
-        decoder.bytes(4).forEach(byte => blockEncoder2.uint8(byte));
+        blockEncoder1.bytes(decoder.bytes(4));
+        blockEncoder2.bytes(decoder.bytes(4));
       }
 
-      blockBuffer1.forEach(byte => encoder.uint8(byte));
-      blockBuffer2.forEach(byte => encoder.uint8(byte));
+      encoder.bytes(blockEncoder1.buffer);
+      encoder.bytes(blockEncoder2.buffer);
     } else if (header.pixelFormat.fourCC == FourCC.DST3) {
       throw new Error("DST3 not supported.");
     } else if (header.pixelFormat.fourCC == FourCC.DST5) {
-      const count = (buffer.byteLength - 128) / 16;
+      const count = (buffer.byteLength - dataOffset) / 16;
 
-      const blockBuffer1 = Buffer.alloc(count * 2);
-      const blockBuffer2 = Buffer.alloc(count * 6);
-      const blockBuffer3 = Buffer.alloc(count * 4);
-      const blockBuffer4 = Buffer.alloc(count * 4);
-
-      const blockEncoder1 = new BinaryEncoder(blockBuffer1);
-      const blockEncoder2 = new BinaryEncoder(blockBuffer2);
-      const blockEncoder3 = new BinaryEncoder(blockBuffer3);
-      const blockEncoder4 = new BinaryEncoder(blockBuffer4);
+      const blockEncoder1 = BinaryEncoder.alloc(count * 2);
+      const blockEncoder2 = BinaryEncoder.alloc(count * 6);
+      const blockEncoder3 = BinaryEncoder.alloc(count * 4);
+      const blockEncoder4 = BinaryEncoder.alloc(count * 4);
 
       for (let i = 0; i < count; i++) {
-        // FIXME: add a better way to handle this in binary encoder
-        decoder.bytes(2).forEach(byte => blockEncoder1.uint8(byte));
-        decoder.bytes(6).forEach(byte => blockEncoder2.uint8(byte));
-        decoder.bytes(4).forEach(byte => blockEncoder3.uint8(byte));
-        decoder.bytes(4).forEach(byte => blockEncoder4.uint8(byte));
+        blockEncoder1.bytes(decoder.bytes(2));
+        blockEncoder2.bytes(decoder.bytes(6));
+        blockEncoder3.bytes(decoder.bytes(4));
+        blockEncoder4.bytes(decoder.bytes(4));
       }
 
       // order is intentional
-      blockBuffer1.forEach(byte => encoder.uint8(byte));
-      blockBuffer3.forEach(byte => encoder.uint8(byte));
-      blockBuffer2.forEach(byte => encoder.uint8(byte));
-      blockBuffer4.forEach(byte => encoder.uint8(byte));
+      encoder.bytes(blockEncoder1.buffer);
+      encoder.bytes(blockEncoder3.buffer);
+      encoder.bytes(blockEncoder2.buffer);
+      encoder.bytes(blockEncoder4.buffer);
     }
+
+    return shuffledBuffer;
   }
 
   static unshuffle(header: RleInfo, buffer: Buffer): Buffer {
-    // const int dataOffset = 128;
-    // var dataSize = (int)(s.Length - dataOffset);
+    const dataOffset = 128;
+    const dataSize = buffer.byteLength - dataOffset;
 
-    // s.Position = dataOffset;
-    // BinaryReader r = new BinaryReader(s);
+    const decoder = new BinaryDecoder(buffer);
+    decoder.seek(dataOffset);
 
     // MemoryStream result = new MemoryStream();
     // BinaryWriter w = new BinaryWriter(result);
