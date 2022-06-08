@@ -30,11 +30,14 @@ export class DstResource {
     const dataOffset = 128;
     const decoder = new BinaryDecoder(buffer);
     const encoder = BinaryEncoder.alloc(buffer.byteLength);
-    encoder.seek(128);
-
-    // FIXME: what does this actually do? how does the header change? what about the first 128 bytes?
 
     if (header.pixelFormat.fourCC === FourCC.DST1) {
+      const headerClone = clone(header);
+      headerClone.pixelFormat.fourCC = FourCC.DXT1;
+      encoder.uint32(RleInfo.SIGNATURE);
+      encoder.bytes(headerClone.serialize());
+      encoder.seek(dataOffset); // FIXME: necessary?
+
       const count = (buffer.byteLength - dataOffset) / 8;
 
       const blockEncoder1 = BinaryEncoder.alloc(count * 4);
@@ -50,6 +53,12 @@ export class DstResource {
     } else if (header.pixelFormat.fourCC === FourCC.DST3) {
       throw new Error("DST3 not supported.");
     } else if (header.pixelFormat.fourCC === FourCC.DST5) {
+      const headerClone = clone(header);
+      headerClone.pixelFormat.fourCC = FourCC.DXT5;
+      encoder.uint32(RleInfo.SIGNATURE);
+      encoder.bytes(headerClone.serialize());
+      encoder.seek(dataOffset); // FIXME: necessary?
+
       const count = (buffer.byteLength - dataOffset) / 16;
 
       const blockEncoder1 = BinaryEncoder.alloc(count * 2);
