@@ -31,8 +31,8 @@ export default class PixelFormat implements PixelFormatFields {
   alphaBitMask: number;
 
   constructor(fields?: Partial<PixelFormatFields>) {
-    if (fields?.size != undefined && fields.size !== this.size)
-      throw new Error(`Expected size to be ${this.size}, got ${fields.size}.`);
+    if (fields?.size != undefined && fields.size !== PixelFormat.STRUCTURE_SIZE)
+      throw new Error(`Expected size to be ${PixelFormat.STRUCTURE_SIZE}, got ${fields.size}.`);
 
     this.pixelFormatFlag = fields?.pixelFormatFlag ?? PixelFormatFlags.FourCC;
     if (!(this.pixelFormatFlag in PixelFormatFlags))

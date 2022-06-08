@@ -25,29 +25,30 @@ interface DdsHeaderFields {
  */
 export default class DdsHeader implements DdsHeaderFields {
   // static readonly SIGNATURE = 0x20534444;
+  static readonly STRUCTURE_SIZE = PixelFormat.STRUCTURE_SIZE + 92;
   static readonly RESERVED1_LENGTH = 44;
   static readonly RESERVED2_LENGTH = 12;
 
-  readonly size: number = PixelFormat.STRUCTURE_SIZE + 92;
-  headerFlags: HeaderFlags = HeaderFlags.Texture;
-  height: number = 0;
-  width: number = 0;
-  pitchOrLinearSize: number = 0;
-  depth: number = 1;
-  pixelFormat: PixelFormat = new PixelFormat();
-  surfaceFlags: number = 0;
-  cubemapFlags: number = 0;
-  version: RleVersion = RleVersion.RLE2;
-  mipCount: number = 0;
-  unknown0E: number = 0;
+  readonly size = DdsHeader.STRUCTURE_SIZE;
+  headerFlags: HeaderFlags;
+  height: number;
+  width: number;
+  pitchOrLinearSize: number;
+  depth: number;
+  pixelFormat: PixelFormat;
+  surfaceFlags: number;
+  cubemapFlags: number;
+  version: RleVersion;
+  mipCount: number;
+  unknown0E: number;
 
   get hasSpecular(): boolean {
     return this.version === RleVersion.RLES;
   }
 
   constructor(fields?: Partial<DdsHeaderFields>) {
-    if (fields?.size != undefined && fields.size !== this.size)
-      throw new Error(`Expected size to be ${this.size}, got ${fields.size}.`);
+    if (fields?.size != undefined && fields.size !== DdsHeader.STRUCTURE_SIZE)
+      throw new Error(`Expected size to be ${DdsHeader.STRUCTURE_SIZE}, got ${fields.size}.`);
 
     this.headerFlags = fields?.headerFlags ?? HeaderFlags.Texture;
     if ((this.headerFlags & HeaderFlags.Texture) !== HeaderFlags.Texture)
