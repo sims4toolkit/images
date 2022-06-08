@@ -3,7 +3,7 @@ import { HeaderFlags, RleVersion } from "../enums";
 import PixelFormat from "../pixel-format";
 
 /**
- * TODO:
+ * DTO for the fields in the DDS header structure.
  */
 interface DdsHeaderFields {
   readonly size: number;
@@ -21,7 +21,7 @@ interface DdsHeaderFields {
 }
 
 /**
- * TODO:
+ * Model for the DDS header structure.
  */
 export default class DdsHeader implements DdsHeaderFields {
   // static readonly SIGNATURE = 0x20534444;
@@ -111,9 +111,15 @@ export default class DdsHeader implements DdsHeaderFields {
     return new DdsHeader(fields);
   }
 
-  serialize(): Buffer {
-    const buffer = Buffer.alloc(this.size);
-    const encoder = new BinaryEncoder(buffer);
+  /**
+   * Serializes this DdsHeader into a buffer and returns it.
+   * 
+   * @param encoder Encoder to write the DdsHeader to, if any. If not provided,
+   * a new buffer and encder will be created. Regardless of if this is provided
+   * or not, the buffer that was written to will be returned.
+   */
+  serialize(encoder?: BinaryEncoder): Buffer {
+    encoder ??= new BinaryEncoder(Buffer.alloc(this.size));
 
     encoder.uint32(this.size);
     encoder.uint32(this.headerFlags);
@@ -128,6 +134,6 @@ export default class DdsHeader implements DdsHeaderFields {
     encoder.uint32(this.cubemapFlags);
     // intentionally not writing reserved2 bytes
 
-    return buffer;
+    return encoder.buffer;
   }
 }

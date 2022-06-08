@@ -2,7 +2,7 @@ import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
 import { FourCC, PixelFormatFlags } from "./enums";
 
 /**
- *  A DTO for the fields in the pixel format structure.
+ * DTO for the fields in the pixel format structure.
  */
 interface PixelFormatFields {
   readonly size: number;
@@ -16,7 +16,7 @@ interface PixelFormatFields {
 }
 
 /**
- * A model for the pixel format structure.
+ * Model for the pixel format structure.
  */
 export default class PixelFormat implements PixelFormatFields {
   static readonly STRUCTURE_SIZE = 32;
