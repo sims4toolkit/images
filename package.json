@@ -4,19 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "clean": "rm -rf ./dst/** ; rm -rf ./out/**",
-    "build": "npm run clean ; tsc",
-    "dev": "npm run clean ; tsc --watch",
+    "clean:dst": "rm -rf ./dst/**",
+    "clean:out": "rm -rf ./out/**",
+    "build": "npm run clean:dst ; tsc",
+    "dev": "npm run clean:dst ; tsc --watch",
     "test": "ts-node test/dst-to-png.test.ts"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.41",
     "glob": "^7.2.0"
   },
   "dependencies": {
     "@s4tk/encoding": "^0.1.4",
-    "just-clone": "^6.0.1"
+    "dxt-js": "^0.0.3",
+    "jimp": "^0.16.1"
   }
 }

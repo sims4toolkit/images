@@ -109,8 +109,8 @@ export default class DdsHeader implements DdsHeaderFields {
       mipCount: decoder.uint32(),
       pixelFormat: skipThen(
         DdsHeader.RESERVED1_LENGTH,
-        () => PixelFormat.from(decoder.slice(PixelFormat.STRUCTURE_SIZE)
-        )),
+        () => PixelFormat.from(decoder.slice(PixelFormat.STRUCTURE_SIZE))
+      ),
       surfaceFlags: decoder.uint32(),
       cubemapFlags: decoder.uint32()
     };
@@ -139,7 +139,7 @@ export default class DdsHeader implements DdsHeaderFields {
     this.pixelFormat.serialize(encoder);
     encoder.uint32(this.surfaceFlags);
     encoder.uint32(this.cubemapFlags);
-    // intentionally not writing reserved2 bytes
+    encoder.skip(DdsHeader.RESERVED2_LENGTH);
 
     return encoder.buffer;
   }
