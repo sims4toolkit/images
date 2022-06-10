@@ -2,7 +2,6 @@ import Jimp from "jimp";
 import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
 import { FourCC, HeaderFlags } from "./enums";
 import DdsHeader from "./dds-header";
-import { findPowerOfTwo } from "./helpers";
 
 try {
   var dxt = require("dxt-js");
@@ -29,6 +28,8 @@ export default class DdsImage {
       this.header.pixelFormat.fourCC === FourCC.DST5;
   }
 
+  //#region Initialization
+
   private constructor(
     public readonly header: DdsHeader,
     public readonly buffer: Buffer
@@ -54,7 +55,9 @@ export default class DdsImage {
 
   /**
    * Creates a new DDS image from a header and the data it contains. The buffer
-   * must contain the image data and image data only, NOT the header.
+   * must contain the image data and image data only, NOT the header. The data
+   * may contain one or more mipmaps, but the number of mipmaps it contains
+   * must match the number specified in the header.
    * 
    * @param header Header of DDS image being created
    * @param ddsData Actual DDS image data
@@ -69,71 +72,69 @@ export default class DdsImage {
 
   /**
    * Reads an image buffer and converts it to a DdsImage. Supported image types
-   * include JPEG, PNG, BMP, TIFF, and GIF. Dimensions should be a power of 2
-   * greater than 4; if not, they will be resized. The max mip count must be
-   * 1 at the lowest, and 15 at the highest.
+   * include JPEG, PNG, TIFF, and GIF. Dimensions should be a power of 2 greater
+   * than 4; if not, they will be resized. The max mip count must be 1 at the
+   * lowest, and 15 at the highest.
    * 
    * @param buffer Buffer containing the image in another format
-   * @param maxMipCount Maximum number of mipmaps to create, 15 by default
-   * @param shuffle Whether or not to shuffle the DDS data, false by default
    */
-  static async fromImage(
-    buffer: Buffer,
-    maxMipCount = 15,
-    shuffle = false,
-  ): Promise<DdsImage> {
-    return new Promise(async (resolve, reject) => {
-      const image = await Jimp.read(buffer);
+  static fromImage(imageData: Buffer | Bitmap): DdsImage {
+    return DdsImage.fromJimp(new Jimp(imageData));
+  }
 
-      const submittedWidth = image.bitmap.width;
-      const submittedHeight = image.bitmap.height;
+  /**
+   * TODO:
+   * 
+   * @param image TODO:
+   */
+  static fromJimp(image: Jimp): DdsImage {
+    const submittedWidth = image.bitmap.width;
+    const submittedHeight = image.bitmap.height;
 
-      if (submittedWidth < 4 || submittedHeight < 4)
-        reject("Dimensions must be >= 4.");
+    if (submittedWidth < 4 || submittedHeight < 4)
+      throw new Error("Dimensions must be >= 4.");
 
-      const initialWidth = findPowerOfTwo(submittedWidth);
-      const initialHeight = findPowerOfTwo(submittedHeight);
+    const initialWidth = findPowerOfTwo(submittedWidth);
+    const initialHeight = findPowerOfTwo(submittedHeight);
+    const compressedBuffers: Buffer[] = [];
 
-      const compressedBuffers: Buffer[] = [];
+    let mips = 1;
+    let currentWidth = initialWidth;
+    let currentHeight = initialHeight;
 
-      let mips = 1;
-      let currentWidth = initialWidth;
-      let currentHeight = initialHeight;
+    while (currentWidth > 4 && currentHeight > 4 && mips <= 15) {
+      if (currentWidth !== initialWidth || currentHeight !== initialHeight)
+        image.resize(currentWidth, currentHeight);
 
-      while (currentWidth > 4 && currentHeight > 4 && mips <= maxMipCount) {
-        if (currentWidth !== initialWidth || currentHeight !== initialHeight)
-          image.resize(currentWidth, currentHeight);
-
-        compressedBuffers.push(
-          dxt.compress(
-            image.bitmap.data,
-            currentWidth,
-            currentHeight,
-            dxt.flags.DXT5
-          )
-        );
-
-        currentWidth /= 2;
-        currentHeight /= 2;
-        mips++;
-      }
-
-      const header = new DdsHeader({
-        width: initialWidth,
-        height: initialHeight,
-        headerFlags: HeaderFlags.Texture | HeaderFlags.Mipmap,
-        surfaceFlags: 0x00401008,
-        mipCount: mips - 1,
-      });
-
-      const dds = DdsImage.fromDdsData(
-        header,
-        Buffer.concat(compressedBuffers)
+      compressedBuffers.push(
+        dxt.compress(
+          image.bitmap.data,
+          currentWidth,
+          currentHeight,
+          dxt.flags.DXT5
+        )
       );
 
-      resolve(shuffle ? dds.toShuffled() : dds);
+      currentWidth /= 2;
+      currentHeight /= 2;
+      mips++;
+    }
+
+    const header = new DdsHeader({
+      width: initialWidth,
+      height: initialHeight,
+      headerFlags: HeaderFlags.Texture | HeaderFlags.Mipmap,
+      surfaceFlags: 0x00401008,
+      mipCount: mips - 1,
     });
+
+    return DdsImage.fromDdsData(
+      header,
+      Buffer.concat(compressedBuffers)
+    );
   }
+
+  //#endregion Initialization
 
   //#region Public Methods
 
@@ -148,12 +149,31 @@ export default class DdsImage {
   }
 
   /**
-   * Returns a deep copy of this image, guaranteed to use DXT compression.
+   * TODO:
    */
-  toUnshuffled(): DdsImage {
-    return this.isShuffled
-      ? this._unshuffle()
-      : this.clone();
+  toBitmap(): Bitmap {
+    const dds = this.isShuffled ? this.toUnshuffled() : this;
+
+    const { width, height } = this.header;
+
+    const data = dxt.decompress(
+      dds.buffer.slice(
+        DdsImage.DATA_OFFSET,
+        DdsImage.DATA_OFFSET + (width * height) / 4
+      ),
+      width,
+      height,
+      dxt.flags.DXT5 // FIXME: not all will be DXT5
+    );
+
+    return { width, height, data };
+  }
+
+  /**
+   * TODO:
+   */
+  toJimp(): Jimp {
+    return new Jimp(this.toBitmap());
   }
 
   /**
@@ -162,6 +182,15 @@ export default class DdsImage {
   toShuffled(): DdsImage {
     return !this.isShuffled
       ? this._shuffle()
+      : this.clone();
+  }
+
+  /**
+   * Returns a deep copy of this image, guaranteed to use DXT compression.
+   */
+  toUnshuffled(): DdsImage {
+    return this.isShuffled
+      ? this._unshuffle()
       : this.clone();
   }
 
@@ -289,3 +318,37 @@ export default class DdsImage {
 
   //#endregion Private Methods
 }
+
+//#region Types
+
+interface Bitmap {
+  data: Buffer;
+  width: number;
+  height: number;
+}
+
+//#endregion Types
+
+//#region Helpers
+
+/**
+ * Finds the closet power of 2 that is less than or equal to the given number.
+ * Yes, this is inefficient. But, it should never be used on numbers that would
+ * loop more than ~8 times anyways, so who cares.
+ * 
+ * @param n Number to find closet power of 2 for
+ */
+function findPowerOfTwo(n: number): number {
+  if (n < 1) throw new Error("N must be >= 1");
+  let power = 1;
+  while (true) {
+    const nextPower = power * 2;
+    if (nextPower <= n) {
+      power = nextPower;
+    } else {
+      return power;
+    }
+  }
+}
+
+//#endregion Helpers
