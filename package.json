@@ -2,7 +2,15 @@
   "name": "@s4tk/images",
   "version": "0.1.0",
   "description": "",
-  "main": "images.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sims4toolkit/images.git"
+  },
+  "homepage": "https://sims4toolkit.com/#/docs/images",
+  "bugs": {
+    "url": "https://github.com/sims4toolkit/images/issues"
+  },
+  "main": "./images.js",
   "scripts": {
     "clean": "rm -rf ./dst/**",
     "dev": "npm run clean ; tsc --watch",
@@ -11,7 +19,11 @@
     "clean:conversions": "rm -rf ./test/conversions/out/**",
     "test:conversions": "npm run clean:conversions ; ts-node ./test/conversions/conversions.test.ts"
   },
-  "author": "",
+  "author": "frankkulak",
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/bePatron?u=40823163"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.41"

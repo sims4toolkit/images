@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "interface",
+      "name": "Bitmap"
+    },
+    "description": "Object that interfaces with Jimp images.",
+    "sourceCode": "src/lib/types.ts"
+  },
+  "sections": [
+    {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "name": "data",
+          "description": "Buffer containing the image's data in bytes.",
+          "type": {
+            "name": "Buffer"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "width",
+          "description": "Width of the image.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "name": "height",
+          "description": "Height of the image.",
+          "type": {
+            "name": "number"
+          }
+        }
+      ]
+    }
+  ]
+}
