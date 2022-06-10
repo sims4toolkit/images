@@ -167,16 +167,27 @@ export default class DdsImage {
   toBitmap(): Bitmap {
     const dds = this.isShuffled ? this.toUnshuffled() : this;
 
+    // guaranteed to not be DST since dds gets unshuffled
+    const compression = (() => {
+      switch (dds.header.pixelFormat.fourCC) {
+        case FourCC.DXT1: return dxt.flags.DXT1;
+        case FourCC.DXT3: return dxt.flags.DXT3;
+        case FourCC.DXT5: return dxt.flags.DXT5;
+        default:
+          throw new Error("Non-DXT DDS images cannot be converted to bitmaps.")
+      }
+    })();
+
     const { width, height } = this.header;
 
     const data = dxt.decompress(
       dds.buffer.slice(
         DdsImage.DATA_OFFSET,
-        DdsImage.DATA_OFFSET + (width * height) // FIXME: why not divide by 4??
+        DdsImage.DATA_OFFSET + (width * height)
       ),
       width,
       height,
-      dxt.flags.DXT5 // FIXME: not all will be DXT5
+      compression
     );
 
     return { width, height, data };
