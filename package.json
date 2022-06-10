@@ -4,11 +4,12 @@
   "description": "",
   "main": "images.js",
   "scripts": {
-    "clean:dst": "rm -rf ./dst/**",
-    "clean:out": "rm -rf ./out/**",
-    "dev": "npm run clean:dst ; tsc --watch",
-    "build": "npm run clean:dst ; tsc ; node scripts/prepublish.cjs",
-    "publish": "npm run build && sh scripts/publish.sh"
+    "clean": "rm -rf ./dst/**",
+    "dev": "npm run clean ; tsc --watch",
+    "build": "npm run clean ; tsc ; node scripts/prepublish.cjs",
+    "publish": "npm run build && sh scripts/publish.sh",
+    "clean:conversions": "rm -rf ./test/conversions/out/**",
+    "test:conversions": "npm run clean:conversions ; ts-node ./test/conversions/conversions.test.ts"
   },
   "author": "",
   "license": "MIT",
