@@ -4,4 +4,4 @@ node_modules/
 dst/
 out/
 localTests/
-images/
+./images/

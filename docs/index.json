@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-index-schema.json",
+  "versions": [
+    "0.1.0"
+  ],
+  "groups": [
+    {
+      "name": "images",
+      "items": [
+        "DdsImage"
+      ]
+    },
+    {
+      "name": "classes",
+      "items": [
+        "DdsHeader",
+        "PixelFormat"
+      ]
+    },
+    {
+      "name": "enums",
+      "items": [
+        "FourCC",
+        "HeaderFlags",
+        "PixelFormatFlags",
+        "RleVersion"
+      ]
+    }
+  ]
+}
