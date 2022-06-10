@@ -1,5 +1,5 @@
-import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
 import Jimp from "jimp";
+import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
 import { FourCC, HeaderFlags } from "./enums";
 import DdsHeader from "./dds-header";
 import { findPowerOfTwo } from "./helpers";
@@ -35,7 +35,8 @@ export default class DdsImage {
   ) { }
 
   /**
-   * Reads a DdsImage object from the given buffer. 
+   * Reads a DdsImage object from the given buffer. The buffer must contain the
+   * entire DDS image, including signature and header.
    * 
    * @param buffer Buffer to read data from
    */
@@ -52,10 +53,11 @@ export default class DdsImage {
   }
 
   /**
-   * Creates a new DDS image from a header and the data it contains.
+   * Creates a new DDS image from a header and the data it contains. The buffer
+   * must contain the image data and image data only, NOT the header.
    * 
    * @param header Header of DDS image being created
-   * @param ddsData Actual DDS data
+   * @param ddsData Actual DDS image data
    */
   static fromDdsData(header: DdsHeader, ddsData: Buffer): DdsImage {
     const encoder = BinaryEncoder.alloc(4 + header.size + ddsData.length);
@@ -66,22 +68,22 @@ export default class DdsImage {
   }
 
   /**
-   * Reads an image file and converts it to a DdsImage. Supported image types
+   * Reads an image buffer and converts it to a DdsImage. Supported image types
    * include JPEG, PNG, BMP, TIFF, and GIF. Dimensions should be a power of 2
    * greater than 4; if not, they will be resized. The max mip count must be
    * 1 at the lowest, and 15 at the highest.
    * 
-   * @param filepath Absolute path to image file
+   * @param buffer Buffer containing the image in another format
    * @param maxMipCount Maximum number of mipmaps to create, 15 by default
    * @param shuffle Whether or not to shuffle the DDS data, false by default
    */
-  static async fromImageFile(
-    filepath: string,
+  static async fromImage(
+    buffer: Buffer,
     maxMipCount = 15,
-    shuffle = false
+    shuffle = false,
   ): Promise<DdsImage> {
     return new Promise(async (resolve, reject) => {
-      const image = await Jimp.read(filepath);
+      const image = await Jimp.read(buffer);
 
       const submittedWidth = image.bitmap.width;
       const submittedHeight = image.bitmap.height;
@@ -146,7 +148,7 @@ export default class DdsImage {
   }
 
   /**
-   * Returns a deep copy of this image, guaranteed to be in a DXT format.
+   * Returns a deep copy of this image, guaranteed to use DXT compression.
    */
   toUnshuffled(): DdsImage {
     return this.isShuffled
@@ -155,7 +157,7 @@ export default class DdsImage {
   }
 
   /**
-   * Returns a deep copy of this image, guaranteed to be in a DST format.
+   * Returns a deep copy of this image, guaranteed to use DST compression.
    */
   toShuffled(): DdsImage {
     return !this.isShuffled
