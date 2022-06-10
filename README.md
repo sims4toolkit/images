@@ -6,6 +6,10 @@ This project contains models and algorithms required for processing images that 
 
 Major credit goes towards the creators of [S4PI](https://github.com/s4ptacle/Sims4Tools), specifically those who contributed to the [DstResource](https://github.com/s4ptacle/Sims4Tools/blob/develop/s4pi%20Wrappers/ImageResource/DSTResource.cs). Without this implementation, I wouldn't have been able to figure out shuffling/unshuffling for the DST compression algorithm.
 
+## ⚠️ Experimental ⚠️
+
+While all S4TK software is in pre-release, this package is especially experimental. I cannot guarantee that conversions between image formats is going to go smoothly. For best results, use PNG for both importing and exporting DDS images. JPG/BMP do not support transparency, and GIF/TIFF may appear discolored when exported.
+
 ## Installation
 
 Install the package as a dependency from npm with the following command:
