@@ -1,6 +1,15 @@
 import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
-import { FourCC } from "../enums";
+import Jimp from "jimp";
+import { FourCC, HeaderFlags } from "./enums";
 import DdsHeader from "./dds-header";
+import { findPowerOfTwo } from "./helpers";
+
+try {
+  var dxt = require("dxt-js");
+} catch (err) {
+  var dxt;
+  console.warn("DXT compression not supported in this environment.", err);
+}
 
 /**
  * Model for a DDS images, which may be in DXT (unsuhffled) or DST (shuffled)
@@ -40,6 +49,92 @@ export default class DdsImage {
     const header = DdsHeader.from(decoder.slice(DdsHeader.STRUCTURE_SIZE));
 
     return new DdsImage(header, buffer);
+  }
+
+  /**
+   * Creates a new DDS image from a header and the data it contains.
+   * 
+   * @param header Header of DDS image being created
+   * @param ddsData Actual DDS data
+   */
+  static fromDdsData(header: DdsHeader, ddsData: Buffer): DdsImage {
+    const encoder = BinaryEncoder.alloc(4 + header.size + ddsData.length);
+    encoder.uint32(DdsImage.SIGNATURE);
+    header.serialize(encoder);
+    encoder.bytes(ddsData);
+    return new DdsImage(header, encoder.buffer);
+  }
+
+  /**
+   * Reads an image file and converts it to a DdsImage. Supported image types
+   * include JPEG, PNG, BMP, TIFF, and GIF. Dimensions should be a power of 2
+   * greater than 4; if not, they will be resized. The max mip count must be
+   * 1 at the lowest, and 15 at the highest.
+   * 
+   * @param filepath Absolute path to image file
+   * @param width Width of image being loaded
+   * @param height Height of image being loaded
+   * @param maxMipCount Maximum number of mipmaps to create, 15 by default
+   * @param shuffle Whether or not to shuffle the DDS data, false by default
+   */
+  static async fromImageFile(
+    filepath: string,
+    width: number,
+    height: number,
+    maxMipCount = 15,
+    shuffle = false
+  ): Promise<DdsImage> {
+    return new Promise((resolve, reject) => {
+      try {
+        var initialWidth = findPowerOfTwo(width);
+        var initialHeight = findPowerOfTwo(height);
+
+        if (initialWidth < 4 || initialHeight < 4)
+          throw new Error("Dimensions must be >= 4.")
+      } catch (err) {
+        reject(`Invalid image dimensions: ${err}`);
+      }
+
+      Jimp.read(filepath)
+        .then(image => {
+          const compressedBuffers: Buffer[] = [];
+
+          let mips = 1;
+          let currentWidth = initialWidth;
+          let currentHeight = initialHeight;
+
+          while (currentWidth > 4 && currentHeight > 4 && mips <= maxMipCount) {
+            if (currentWidth !== width || currentHeight !== height)
+              image.resize(currentWidth, currentHeight);
+
+            compressedBuffers.push(
+              dxt.compress(
+                image.bitmap.data,
+                currentWidth,
+                currentHeight,
+                dxt.flags.DXT5
+              )
+            );
+
+            currentWidth /= 2;
+            currentHeight /= 2;
+            mips++;
+          }
+
+          const header = new DdsHeader({
+            width: initialWidth,
+            height: initialHeight,
+            headerFlags: HeaderFlags.Texture | HeaderFlags.Mipmap,
+            surfaceFlags: 0x00401008,
+            mipCount: mips,
+          });
+
+          return DdsImage.fromDdsData(header, Buffer.concat(compressedBuffers));
+        })
+        .then(dds => {
+          resolve(shuffle ? dds.toShuffled() : dds);
+        });
+    });
   }
 
   //#region Public Methods
