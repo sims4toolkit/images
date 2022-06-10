@@ -1,0 +1,100 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "class",
+      "name": "PixelFormat"
+    },
+    "description": "Model for the pixel format structure. Note that this documentation only shows properties, because that is all you will have access to.",
+    "sourceCode": "src/lib/pixel-format.ts"
+  },
+  "sections": [
+    {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "size",
+          "description": "Byte size of this structure.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "pixelFormatFlag",
+          "description": "Flags for pixel format.",
+          "type": {
+            "name": "PixelFormatFlags",
+            "path": {
+              "pkg": "images",
+              "group": "types",
+              "item": "PixelFormatFlags"
+            }
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "fourCC",
+          "description": "Type of DDS compression.",
+          "type": {
+            "name": "FourCC",
+            "path": {
+              "pkg": "images",
+              "group": "types",
+              "item": "FourCC"
+            }
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "rgbBitCount",
+          "description": "Honestly, your guess is as good as mine. Usually 0.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "redBitMask",
+          "description": "32-bit mask to capture red value.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "greenBitMask",
+          "description": "32-bit mask to capture green value.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "blueBitMask",
+          "description": "32-bit mask to capture blue value.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "alphaBitMask",
+          "description": "32-bit mask to capture alpha value.",
+          "type": {
+            "name": "number"
+          }
+        }
+      ]
+    }
+  ]
+}

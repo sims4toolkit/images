@@ -1,0 +1,141 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "class",
+      "name": "DdsHeader"
+    },
+    "description": "Model for the DDS header structure. Note that this documentation only shows properties, because that is all you will have access to.",
+    "sourceCode": "src/lib/dds-header.ts"
+  },
+  "sections": [
+    {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "size",
+          "description": "Byte size of this structure.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "headerFlags",
+          "description": "Flags for the header.",
+          "type": {
+            "name": "HeaderFlags",
+            "path": {
+              "pkg": "images",
+              "group": "enums",
+              "item": "HeaderFlags"
+            }
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "height",
+          "description": "Height of image in pixels.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "width",
+          "description": "Width of image in pixels.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "pitchOrLinearSize",
+          "description": "Usually 0.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "depth",
+          "description": "Usually 1.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "pixelFormat",
+          "description": "Format of pixels.",
+          "type": {
+            "name": "PixelFormat",
+            "path": {
+              "pkg": "images",
+              "group": "types",
+              "item": "PixelFormat"
+            }
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "surfaceFlags",
+          "description": "Caps1 flags.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "cubemapFlags",
+          "description": "Caps2 flags.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "version",
+          "description": "RLE version.",
+          "type": {
+            "name": "RleVersion",
+            "path": {
+              "pkg": "images",
+              "group": "enums",
+              "item": "RleVersion"
+            }
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "mipCount",
+          "description": "Number of mipmaps.",
+          "type": {
+            "name": "number"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "unknown0E",
+          "description": "Something, probably.",
+          "type": {
+            "name": "number"
+          }
+        }
+      ]
+    }
+  ]
+}
