@@ -1,3 +1,11 @@
+/*
+  Major credit goes towards the creators of S4PI, specifically those who
+  contributed to the DstResource. Without their implementation, DXT > DST and
+  DST > DXT conversions would not have been possible.
+
+  Their code: https://github.com/s4ptacle/Sims4Tools/blob/develop/s4pi%20Wrappers/ImageResource/DSTResource.cs
+*/
+
 import Jimp from "jimp";
 import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
 import { FourCC, HeaderFlags } from "./enums";

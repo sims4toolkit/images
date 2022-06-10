@@ -4,6 +4,8 @@
 
 This project contains models and algorithms required for processing images that appear in various image resources.
 
+Major credit goes towards the creators of [S4PI](https://github.com/s4ptacle/Sims4Tools), specifically those who contributed to the [DstResource](https://github.com/s4ptacle/Sims4Tools/blob/develop/s4pi%20Wrappers/ImageResource/DSTResource.cs). Without this implementation, I wouldn't have been able to figure out shuffling/unshuffling for the DST compression algorithm.
+
 ## Installation
 
 Install the package as a dependency from npm with the following command:
