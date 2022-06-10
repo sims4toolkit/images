@@ -126,7 +126,7 @@ export default class DdsImage {
             height: initialHeight,
             headerFlags: HeaderFlags.Texture | HeaderFlags.Mipmap,
             surfaceFlags: 0x00401008,
-            mipCount: mips,
+            mipCount: mips - 1,
           });
 
           return DdsImage.fromDdsData(header, Buffer.concat(compressedBuffers));
