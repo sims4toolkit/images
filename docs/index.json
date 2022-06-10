@@ -3,6 +3,10 @@
   "versions": [
     "0.1.0"
   ],
+  "notice": {
+    "type": "experimental",
+    "text": "This package is highly experimental. I cannot guarantee that conversions between image formats is going to go smoothly. If importing or exporting DDS images from/to other formats, PNG is recommended for best results."
+  },
   "groups": [
     {
       "name": "images",
