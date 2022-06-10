@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "enum",
+      "name": "RleVersion"
+    },
+    "description": "RLE version of a DDS image.",
+    "sourceCode": "src/lib/enums.ts"
+  },
+  "sections": [
+    {
+      "title": "Values",
+      "content": [
+        {
+          "displayType": "enum",
+          "values": [
+            {
+              "name": "RLE2",
+              "value": "0x32454C52"
+            },
+            {
+              "name": "RLES",
+              "value": "0x53454C52"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

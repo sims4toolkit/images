@@ -11,7 +11,7 @@
       ]
     },
     {
-      "name": "classes",
+      "name": "types",
       "items": [
         "DdsHeader",
         "PixelFormat"

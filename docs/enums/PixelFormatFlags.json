@@ -1,0 +1,39 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "enum",
+      "name": "PixelFormatFlags"
+    },
+    "description": "How pixels are formatted in a DDS image.",
+    "sourceCode": "src/lib/enums.ts"
+  },
+  "sections": [
+    {
+      "title": "Values",
+      "content": [
+        {
+          "displayType": "enum",
+          "values": [
+            {
+              "name": "FourCC",
+              "value": "0x00000004"
+            },
+            {
+              "name": "RGB",
+              "value": "0x00000040"
+            },
+            {
+              "name": "RGBA",
+              "value": "0x00000041"
+            },
+            {
+              "name": "Luminance",
+              "value": "0x00020000"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

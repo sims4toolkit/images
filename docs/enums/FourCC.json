@@ -1,0 +1,51 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "enum",
+      "name": "FourCC"
+    },
+    "description": "Supported DDS compression types.",
+    "sourceCode": "src/lib/enums.ts"
+  },
+  "sections": [
+    {
+      "title": "Values",
+      "content": [
+        {
+          "displayType": "enum",
+          "values": [
+            {
+              "name": "DST1",
+              "value": "0x31545344"
+            },
+            {
+              "name": "DST3",
+              "value": "0x33545344"
+            },
+            {
+              "name": "DST5",
+              "value": "0x35545344"
+            },
+            {
+              "name": "DXT1",
+              "value": "0x31545844"
+            },
+            {
+              "name": "DXT3",
+              "value": "0x33545844"
+            },
+            {
+              "name": "DXT5",
+              "value": "0x35545844"
+            },
+            {
+              "name": "None",
+              "value": "0x00000000"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

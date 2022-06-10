@@ -1,0 +1,43 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "header": {
+    "title": {
+      "prefix": "enum",
+      "name": "HeaderFlags"
+    },
+    "description": "Flags to use in the header of a DDS image.",
+    "sourceCode": "src/lib/enums.ts"
+  },
+  "sections": [
+    {
+      "title": "Values",
+      "content": [
+        {
+          "displayType": "enum",
+          "values": [
+            {
+              "name": "Texture",
+              "value": "0x00001007"
+            },
+            {
+              "name": "Mipmap",
+              "value": "0x00020000"
+            },
+            {
+              "name": "Volume",
+              "value": "0x00800000"
+            },
+            {
+              "name": "Pitch",
+              "value": "0x00000008"
+            },
+            {
+              "name": "LinearSize",
+              "value": "0x00080000"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
