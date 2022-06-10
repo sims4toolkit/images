@@ -6,8 +6,9 @@
   "scripts": {
     "clean:dst": "rm -rf ./dst/**",
     "clean:out": "rm -rf ./out/**",
-    "build": "npm run clean:dst ; tsc",
-    "dev": "npm run clean:dst ; tsc --watch"
+    "dev": "npm run clean:dst ; tsc --watch",
+    "build": "npm run clean:dst ; tsc ; node scripts/prepublish.cjs",
+    "publish": "npm run build && sh scripts/publish.sh"
   },
   "author": "",
   "license": "MIT",
