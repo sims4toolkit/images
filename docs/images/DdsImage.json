@@ -9,7 +9,7 @@
       "prefix": "class",
       "name": "DdsImage"
     },
-    "description": "Model for a DDS images, which may be in DXT (unsuhffled) or DST (shuffled) formats.",
+    "description": "Model for DDS images, which may be in DXT (unshuffled) or DST (shuffled) formats.",
     "sourceCode": "src/lib/dds-image.ts"
   },
   "sections": [
@@ -20,7 +20,7 @@
           "displayType": "property",
           "prefix": "readonly",
           "name": "buffer",
-          "description": "Buffer that contains all of the encoded data for this image, including its siganture and header.",
+          "description": "Buffer that contains all of the encoded data for this image, including its signature and header.",
           "type": {
             "name": "Buffer"
           }
@@ -183,7 +183,7 @@
           },
           "examples": [
             {
-              "code": "// Example of getting a buffer containing PNG data\n\nddsImage.toJimp().getBufferAsync(\"image/png\")\n\n  .then(buffer => {\n\n    // do something with buffer\n\n  });"
+              "code": "// Example of getting a buffer containing PNG data\nddsImage.toJimp().getBufferAsync(\"image/png\")\n  .then(buffer => {\n    // do something with buffer\n  });"
             }
           ]
         },

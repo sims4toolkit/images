@@ -21,7 +21,7 @@ try {
 }
 
 /**
- * Model for a DDS images, which may be in DXT (unsuhffled) or DST (shuffled)
+ * Model for DDS images, which may be in DXT (unshuffled) or DST (shuffled)
  * formats.
  */
 export default class DdsImage {
