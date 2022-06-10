@@ -56,9 +56,10 @@ export default class DdsImage {
   }
 
   /**
-   * TODO:
+   * Asynchronously reads a DdsImage object from the given buffer. The buffer
+   * must contain the entire DDS image, including signature and header.
    * 
-   * @param buffer TODO:
+   * @param buffer Buffer to read data from
    */
   static async fromAsync(buffer: Buffer): Promise<DdsImage> {
     return new Promise(resolve => {
@@ -67,9 +68,12 @@ export default class DdsImage {
   }
 
   /**
-   * TODO:
+   * Creates a DdsImage from a bitmap that contains 4 bytes per pixel, where
+   * each byte represents R, G, B, and A respectively. Endianness is irrelevant,
+   * as each byte is read individually.
    * 
-   * @param bitmap TODO:
+   * @param bitmap Object containing byte-by-byte information about the image to
+   * load as a DdsImage
    */
   static async fromBitmapAsync(bitmap: Bitmap): Promise<DdsImage> {
     return new Promise(async (resolve) => {
@@ -79,9 +83,12 @@ export default class DdsImage {
 
   /**
    * Reads an image buffer and converts it to a DdsImage. Supported image types
-   * include JPEG, PNG, TIFF, and GIF. Dimensions should be a power of 2 greater
-   * than 4; if not, they will be resized. The max mip count must be 1 at the
-   * lowest, and 15 at the highest.
+   * include PNG, TIFF, GIF, JPG*, and BMP*. Dimensions should be a power of 2
+   * greater than 4; if not, they will be resized.
+   * 
+   * \* = JPG and BMP images are highly problematic. Neither allow transparency,
+   * and BMPs will likely result in distorted colors and shifted pixels. It's
+   * highly recommended that you use one of the other formats.
    * 
    * @param buffer Buffer containing the image in another format
    */
@@ -92,9 +99,9 @@ export default class DdsImage {
   }
 
   /**
-   * TODO:
+   * Creates a DdsImage from a Jimp image object.
    * 
-   * @param image TODO:
+   * @param image Jimp image to load as DdsImage
    */
   static async fromJimpAsync(image: Jimp): Promise<DdsImage> {
     return new Promise(async (resolve, reject) => {
@@ -162,7 +169,8 @@ export default class DdsImage {
   }
 
   /**
-   * TODO:
+   * Returns the data in this image as a bitmap object. This DDS image must be
+   * using either DXT or DST compression, or an exception is thrown.
    */
   toBitmap(): Bitmap {
     const dds = this.isShuffled ? this.toUnshuffled() : this;
@@ -194,7 +202,19 @@ export default class DdsImage {
   }
 
   /**
-   * TODO:
+   * Returns the data in this image as a Jimp object. The Jimp object can then
+   * be used to export the image to various other formats, including PNG, JPG,
+   * BMP, GIF, or TIFF. PNG is highly, highly recommended, as JPG and BMP will
+   * replace transparency with black pixels, and GIF and TIFF will most likely
+   * appear discolored and have seemingly random transparency.
+   * 
+   * ```ts
+   * // Example of getting a buffer containing PNG data
+   * ddsImage.toJimp().getBufferAsync("image/png")
+   *   .then(buffer => {
+   *     // do something with buffer
+   *   });
+   * ```
    */
   toJimp(): Jimp {
     return new Jimp(this.toBitmap());
