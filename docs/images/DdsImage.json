@@ -1,0 +1,209 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-item-schema.json",
+  "imports": [
+    "import { DdsImage } from \"@s4tk/images\"; // ESM",
+    "const { DdsImage } = require(\"@s4tk/images\"); // CJS"
+  ],
+  "header": {
+    "title": {
+      "prefix": "class",
+      "name": "DdsImage"
+    },
+    "description": "Model for a DDS images, which may be in DXT (unsuhffled) or DST (shuffled) formats.",
+    "sourceCode": "src/lib/dds-image.ts"
+  },
+  "sections": [
+    {
+      "title": "Properties",
+      "content": [
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "buffer",
+          "description": "Buffer that contains all of the encoded data for this image, including its siganture and header.",
+          "type": {
+            "name": "Buffer"
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "readonly",
+          "name": "header",
+          "description": "DDS header of this image.",
+          "type": {
+            "name": "DdsHeader",
+            "path": {
+              "pkg": "images",
+              "group": "types",
+              "item": "DdsHeader"
+            }
+          }
+        },
+        {
+          "displayType": "property",
+          "prefix": "get",
+          "name": "isShuffled",
+          "description": "Whether or not this DDS image is shuffled. If it is, this means that it is a DST image. If not, then it can be treated as a regular DDS image.",
+          "type": {
+            "name": "boolean"
+          }
+        }
+      ]
+    },
+    {
+      "title": "Initialization",
+      "content": [
+        {
+          "displayType": "function",
+          "prefix": "static",
+          "name": "from",
+          "description": "Reads a DdsImage object from the given buffer. The buffer must contain the entire DDS image, including signature and header.",
+          "returnType": {
+            "name": "DdsImage"
+          },
+          "arguments": [
+            {
+              "name": "buffer",
+              "type": {
+                "name": "Buffer"
+              },
+              "description": "Buffer to read data from."
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "prefix": "static async",
+          "name": "fromAsync",
+          "description": "Asynchronously reads a DdsImage object from the given buffer. The buffer must contain the entire DDS image, including signature and header.",
+          "returnType": {
+            "name": "Promise<DdsImage>"
+          },
+          "arguments": [
+            {
+              "name": "buffer",
+              "type": {
+                "name": "Buffer"
+              },
+              "description": "Buffer to read data from."
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "prefix": "static async",
+          "name": "fromBitmapAsync",
+          "description": "Creates a DdsImage from a bitmap that contains 4 bytes per pixel, where each byte represents R, G, B, and A respectively. Endianness is irrelevant, as each byte is read individually.",
+          "returnType": {
+            "name": "Promise<DdsImage>"
+          },
+          "arguments": [
+            {
+              "name": "bitmap",
+              "type": {
+                "name": "Bitmap",
+                "path": {
+                  "pkg": "images",
+                  "group": "types",
+                  "item": "Bitmap"
+                }
+              },
+              "description": "Object containing byte-by-byte information about the image to load as a DdsImage."
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "prefix": "static async",
+          "name": "fromImageAsync",
+          "description": "Reads an image buffer and converts it to a DdsImage. Supported image types include PNG, TIFF, GIF, JPG*, and BMP*. Dimensions should be a power of 2 greater than 4; if not, they will be resized.\n\n* = JPG and BMP images are highly problematic. Neither allow transparency, and BMPs will likely result in distorted colors and shifted pixels. It's highly recommended that you use one of the other formats.",
+          "returnType": {
+            "name": "Promise<DdsImage>"
+          },
+          "arguments": [
+            {
+              "name": "buffer",
+              "type": {
+                "name": "Buffer"
+              },
+              "description": "Buffer containing the image in another format."
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "prefix": "static async",
+          "name": "fromJimpAsync",
+          "description": "Creates a DdsImage from a Jimp image object.",
+          "returnType": {
+            "name": "Promise<DdsImage>"
+          },
+          "arguments": [
+            {
+              "name": "image",
+              "type": {
+                "name": "Jimp"
+              },
+              "description": "Jimp image to load as DdsImage."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Methods",
+      "content": [
+        {
+          "displayType": "function",
+          "name": "clone",
+          "description": "Creates a deep copy of this DdsImage object.",
+          "returnType": {
+            "name": "DdsImage"
+          }
+        },
+        {
+          "displayType": "function",
+          "name": "toBitmap",
+          "description": "Returns the data in this image as a bitmap object. This DDS image must be using either DXT or DST compression, or an exception is thrown.",
+          "returnType": {
+            "name": "Bitmap",
+            "path": {
+              "pkg": "images",
+              "group": "types",
+              "item": "Bitmap"
+            }
+          }
+        },
+        {
+          "displayType": "function",
+          "name": "toJimp",
+          "description": "Returns the data in this image as a Jimp object. The Jimp object can then be used to export the image to various other formats, including PNG, JPG, BMP, GIF, or TIFF. PNG is highly, highly recommended, as JPG and BMP will replace transparency with black pixels, and GIF and TIFF will most likely appear discolored and have seemingly random transparency.",
+          "returnType": {
+            "name": "Jimp"
+          },
+          "examples": [
+            {
+              "code": "// Example of getting a buffer containing PNG data\n\nddsImage.toJimp().getBufferAsync(\"image/png\")\n\n  .then(buffer => {\n\n    // do something with buffer\n\n  });"
+            }
+          ]
+        },
+        {
+          "displayType": "function",
+          "name": "toShuffled",
+          "description": "Returns a deep copy of this image, guaranteed to use DST compression.",
+          "returnType": {
+            "name": "DdsImage"
+          }
+        },
+        {
+          "displayType": "function",
+          "name": "toUnshuffled",
+          "description": "Returns a deep copy of this image, guaranteed to use DXT compression.",
+          "returnType": {
+            "name": "DdsImage"
+          }
+        }
+      ]
+    }
+  ]
+}
