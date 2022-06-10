@@ -8,7 +8,13 @@ if (!fs.existsSync(srcDir)) fs.mkdirSync(srcDir, { recursive: true });
 const outDir = path.resolve(__dirname, ".", "out");
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-const otherFileExtensions = ["png", "jpeg", "bmp", "gif", "tiff"];
+const otherFileExtensions = [
+  "png",
+  "jpeg",
+  "bmp",
+  "gif",
+  "tiff",
+];
 
 /*
   The below code takes the PNG, JPG, GIF, TIFF, and BMP images that exist in the
@@ -26,7 +32,7 @@ const otherFileExtensions = ["png", "jpeg", "bmp", "gif", "tiff"];
 
 otherFileExtensions.forEach(ext => {
   const srcPath = path.join(srcDir, `LB.${ext}`);
-  const outPath = path.join(outDir, `LB-${ext}.dds`);
+  const outPath = path.join(outDir, `import-${ext}.dds`);
   const buffer = fs.readFileSync(srcPath);
   DdsImage.fromImageAsync(buffer)
     .then(dds => {
@@ -39,18 +45,16 @@ otherFileExtensions.forEach(ext => {
   "images" directory, converts them to PNG, JPG, GIF, TIFF, and BMP images and
   outputs them to the "out" directory. It should be verified that these are
   valid images and are able to be rendered.
-
-  TODO:
 */
 
 ["dxt", "dst"].forEach(ddsExt => {
   const srcPath = path.join(srcDir, `LB.${ddsExt}`);
   const ddsBuffer = fs.readFileSync(srcPath);
   const dds = DdsImage.from(ddsBuffer).toUnshuffled();
-  fs.writeFileSync(path.join(outDir, `LB-${ddsExt}.dds`), dds.buffer);
+  fs.writeFileSync(path.join(outDir, `shuffle-${ddsExt}.dds`), dds.buffer);
   const image = dds.toJimp();
   otherFileExtensions.forEach(ext => {
-    const outPath = path.join(outDir, `LB-${ddsExt}.${ext}`);
+    const outPath = path.join(outDir, `export-${ddsExt}.${ext}`);
     image.getBufferAsync(`image/${ext}`)
       .then(buffer => {
         fs.writeFileSync(outPath, buffer);

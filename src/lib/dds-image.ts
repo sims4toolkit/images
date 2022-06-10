@@ -172,7 +172,7 @@ export default class DdsImage {
     const data = dxt.decompress(
       dds.buffer.slice(
         DdsImage.DATA_OFFSET,
-        DdsImage.DATA_OFFSET + (width * height) / 4
+        DdsImage.DATA_OFFSET + (width * height) // FIXME: why not divide by 4??
       ),
       width,
       height,
@@ -292,25 +292,27 @@ export default class DdsImage {
    * shuffled, or an exception is thrown.
    */
   private _unshuffle(): DdsImage {
-    const decoder = new BinaryDecoder(this.buffer);
-    decoder.seek(DdsImage.DATA_OFFSET);
-
     const headerClone = this.header.clone();
     const dataSize = this.buffer.byteLength - DdsImage.DATA_OFFSET;
     const encoder = BinaryEncoder.alloc(this.buffer.byteLength);
     encoder.uint32(DdsImage.SIGNATURE);
 
+    const slice = (offset: number, bytes: number) => {
+      const start = DdsImage.DATA_OFFSET + offset;
+      return this.buffer.slice(start, start + bytes);
+    }
+
     if (this.header.pixelFormat.fourCC === FourCC.DST1) {
       headerClone.pixelFormat.fourCC = FourCC.DXT1;
-      encoder.bytes(headerClone.serialize());
+      headerClone.serialize(encoder);
 
       let blockOffset2 = 0;
       let blockOffset3 = blockOffset2 + (dataSize >> 1);
       const count = (blockOffset3 - blockOffset2) / 4;
 
       for (let i = 0; i < count; i++) {
-        encoder.bytes(this.buffer.slice(blockOffset2, blockOffset2 + 4));
-        encoder.bytes(this.buffer.slice(blockOffset3, blockOffset3 + 4));
+        encoder.bytes(slice(blockOffset2, 4));
+        encoder.bytes(slice(blockOffset3, 4));
 
         blockOffset2 += 4;
         blockOffset3 += 4;
@@ -319,7 +321,7 @@ export default class DdsImage {
       throw new Error("DST3 not supported.");
     } else if (this.header.pixelFormat.fourCC == FourCC.DST5) {
       headerClone.pixelFormat.fourCC = FourCC.DXT5;
-      encoder.bytes(headerClone.serialize());
+      headerClone.serialize(encoder);
 
       let blockOffset0 = 0;
       let blockOffset2 = blockOffset0 + (dataSize >> 3);
@@ -329,10 +331,10 @@ export default class DdsImage {
       const count = (blockOffset2 - blockOffset0) / 2;
 
       for (let i = 0; i < count; i++) {
-        encoder.bytes(this.buffer.slice(blockOffset0, blockOffset0 + 2));
-        encoder.bytes(this.buffer.slice(blockOffset1, blockOffset1 + 6));
-        encoder.bytes(this.buffer.slice(blockOffset2, blockOffset2 + 4));
-        encoder.bytes(this.buffer.slice(blockOffset3, blockOffset3 + 4));
+        encoder.bytes(slice(blockOffset0, 2));
+        encoder.bytes(slice(blockOffset1, 6));
+        encoder.bytes(slice(blockOffset2, 4));
+        encoder.bytes(slice(blockOffset3, 4));
 
         blockOffset0 += 2;
         blockOffset1 += 6;
