@@ -72,68 +72,64 @@ export default class DdsImage {
    * 1 at the lowest, and 15 at the highest.
    * 
    * @param filepath Absolute path to image file
-   * @param width Width of image being loaded
-   * @param height Height of image being loaded
    * @param maxMipCount Maximum number of mipmaps to create, 15 by default
    * @param shuffle Whether or not to shuffle the DDS data, false by default
    */
   static async fromImageFile(
     filepath: string,
-    width: number,
-    height: number,
     maxMipCount = 15,
     shuffle = false
   ): Promise<DdsImage> {
-    return new Promise((resolve, reject) => {
-      try {
-        var initialWidth = findPowerOfTwo(width);
-        var initialHeight = findPowerOfTwo(height);
+    return new Promise(async (resolve, reject) => {
+      const image = await Jimp.read(filepath);
 
-        if (initialWidth < 4 || initialHeight < 4)
-          throw new Error("Dimensions must be >= 4.")
-      } catch (err) {
-        reject(`Invalid image dimensions: ${err}`);
+      const submittedWidth = image.bitmap.width;
+      const submittedHeight = image.bitmap.height;
+
+      if (submittedWidth < 4 || submittedHeight < 4)
+        reject("Dimensions must be >= 4.");
+
+      const initialWidth = findPowerOfTwo(submittedWidth);
+      const initialHeight = findPowerOfTwo(submittedHeight);
+
+      const compressedBuffers: Buffer[] = [];
+
+      let mips = 1;
+      let currentWidth = initialWidth;
+      let currentHeight = initialHeight;
+
+      while (currentWidth > 4 && currentHeight > 4 && mips <= maxMipCount) {
+        if (currentWidth !== initialWidth || currentHeight !== initialHeight)
+          image.resize(currentWidth, currentHeight);
+
+        compressedBuffers.push(
+          dxt.compress(
+            image.bitmap.data,
+            currentWidth,
+            currentHeight,
+            dxt.flags.DXT5
+          )
+        );
+
+        currentWidth /= 2;
+        currentHeight /= 2;
+        mips++;
       }
 
-      Jimp.read(filepath)
-        .then(image => {
-          const compressedBuffers: Buffer[] = [];
+      const header = new DdsHeader({
+        width: initialWidth,
+        height: initialHeight,
+        headerFlags: HeaderFlags.Texture | HeaderFlags.Mipmap,
+        surfaceFlags: 0x00401008,
+        mipCount: mips - 1,
+      });
 
-          let mips = 1;
-          let currentWidth = initialWidth;
-          let currentHeight = initialHeight;
+      const dds = DdsImage.fromDdsData(
+        header,
+        Buffer.concat(compressedBuffers)
+      );
 
-          while (currentWidth > 4 && currentHeight > 4 && mips <= maxMipCount) {
-            if (currentWidth !== width || currentHeight !== height)
-              image.resize(currentWidth, currentHeight);
-
-            compressedBuffers.push(
-              dxt.compress(
-                image.bitmap.data,
-                currentWidth,
-                currentHeight,
-                dxt.flags.DXT5
-              )
-            );
-
-            currentWidth /= 2;
-            currentHeight /= 2;
-            mips++;
-          }
-
-          const header = new DdsHeader({
-            width: initialWidth,
-            height: initialHeight,
-            headerFlags: HeaderFlags.Texture | HeaderFlags.Mipmap,
-            surfaceFlags: 0x00401008,
-            mipCount: mips - 1,
-          });
-
-          return DdsImage.fromDdsData(header, Buffer.concat(compressedBuffers));
-        })
-        .then(dds => {
-          resolve(shuffle ? dds.toShuffled() : dds);
-        });
+      resolve(shuffle ? dds.toShuffled() : dds);
     });
   }
 
