@@ -142,7 +142,8 @@
             {
               "name": "image",
               "type": {
-                "name": "Jimp"
+                "name": "Jimp",
+                "externalLink": "https://github.com/oliver-moran/jimp"
               },
               "description": "Jimp image to load as DdsImage."
             }
@@ -179,7 +180,8 @@
           "name": "toJimp",
           "description": "Returns the data in this image as a Jimp object. The Jimp object can then be used to export the image to various other formats, including PNG, JPG, BMP, GIF, or TIFF. PNG is highly, highly recommended, as JPG and BMP will replace transparency with black pixels, and GIF and TIFF will most likely appear discolored and have seemingly random transparency.",
           "returnType": {
-            "name": "Jimp"
+            "name": "Jimp",
+            "externalLink": "https://github.com/oliver-moran/jimp"
           },
           "examples": [
             {
