@@ -229,21 +229,32 @@ export default class DdsImage {
   }
 
   /**
-   * Returns a deep copy of this image, guaranteed to use DST compression.
+   * Returns a deep copy of this image, guaranteed to use DST compression. If
+   * the image this is called on is not compressed or uses DXT3, an exception
+   * will be thrown.
+   * 
+   * @param clone If true, then a clone of this image will be returned if it is
+   * already shuffled. If false, this image itself will be returned. False by
+   * default.
    */
-  toShuffled(): DdsImage {
+  toShuffled(clone = false): DdsImage {
     return !this.isShuffled
       ? this._shuffle()
-      : this.clone();
+      : (clone ? this.clone() : this);
   }
 
   /**
-   * Returns a deep copy of this image, guaranteed to use DXT compression.
+   * Returns a deep copy of this image, guaranteed to use DST compression. If
+   * the image this is called on uses DST3, an exception will be thrown.
+   * 
+   * @param clone If true, then a clone of this image will be returned if it is
+   * already unshuffled. If false, this image itself will be returned. False by
+   * default.
    */
-  toUnshuffled(): DdsImage {
+  toUnshuffled(clone = false): DdsImage {
     return this.isShuffled
       ? this._unshuffle()
-      : this.clone();
+      : (clone ? this.clone() : this);
   }
 
   //#endregion Public Methods

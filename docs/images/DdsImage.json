@@ -192,18 +192,38 @@
         {
           "displayType": "function",
           "name": "toShuffled",
-          "description": "Returns a deep copy of this image, guaranteed to use DST compression.",
+          "description": "Returns a deep copy of this image, guaranteed to use DST compression. If the image this is called on is not compressed or uses DXT3, an exception will be thrown.",
           "returnType": {
             "name": "DdsImage"
-          }
+          },
+          "arguments": [
+            {
+              "name": "clone",
+              "optional": true,
+              "description": "If true, then a clone of this image will be returned if it is already shuffled. If false, this image itself will be returned. False by default.",
+              "type": {
+                "name": "boolean"
+              }
+            }
+          ]
         },
         {
           "displayType": "function",
           "name": "toUnshuffled",
-          "description": "Returns a deep copy of this image, guaranteed to use DXT compression.",
+          "description": "Returns a deep copy of this image, guaranteed to use DST compression. If the image this is called on uses DST3, an exception will be thrown.",
           "returnType": {
             "name": "DdsImage"
-          }
+          },
+          "arguments": [
+            {
+              "name": "clone",
+              "optional": true,
+              "description": "If true, then a clone of this image will be returned if it is already unshuffled. If false, this image itself will be returned. False by default.",
+              "type": {
+                "name": "boolean"
+              }
+            }
+          ]
         }
       ]
     }
