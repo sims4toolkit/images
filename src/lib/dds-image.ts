@@ -181,7 +181,7 @@ export default class DdsImage {
    * using either DXT or DST compression, or an exception is thrown.
    */
   toBitmap(): Bitmap {
-    const dds = this.isShuffled ? this.toUnshuffled() : this;
+    const dds = this.toUnshuffled();
 
     // guaranteed to not be DST since dds gets unshuffled
     const compression = (() => {
