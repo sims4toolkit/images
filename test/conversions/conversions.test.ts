@@ -10,10 +10,10 @@ if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
 const otherFileExtensions = [
   "png",
-  "jpeg",
-  "bmp",
-  "gif",
-  "tiff",
+  // "jpeg",
+  // "bmp",
+  // "gif",
+  // "tiff",
 ];
 
 /*
