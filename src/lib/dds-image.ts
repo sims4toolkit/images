@@ -6,9 +6,10 @@
   Their code: https://github.com/s4ptacle/Sims4Tools/blob/develop/s4pi%20Wrappers/ImageResource/DSTResource.cs
 */
 
-import Jimp from "jimp";
+import type { Jimp as JimpType } from "@jimp/core/types/jimp";
 import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
 import { FourCC, HeaderFlags } from "./enums";
+import Jimp from "./jimp";
 import DdsHeader from "./dds-header";
 import { Bitmap } from "./types";
 import { findPowerOfTwo } from "./helpers";
@@ -90,15 +91,11 @@ export default class DdsImage {
   }
 
   /**
-   * Reads an image buffer and converts it to a DdsImage. Supported image types
-   * include PNG, TIFF, GIF, JPG*, and BMP*. Dimensions should be a power of 2
-   * greater than 4; if not, they will be resized.
+   * Reads an image buffer and converts it to a DdsImage. The only supported
+   * image type is currently PNG. Dimensions should be a power of 2 greater than
+   * 4; if not, they will be resized.
    * 
-   * \* = JPG and BMP images are highly problematic. Neither allow transparency,
-   * and BMPs will likely result in distorted colors and shifted pixels. It's
-   * highly recommended that you use one of the other formats.
-   * 
-   * @param buffer Buffer containing the image in another format
+   * @param buffer Buffer containing PNG image
    */
   static async fromImageAsync(buffer: Buffer): Promise<DdsImage> {
     return new Promise(async (resolve) => {
@@ -111,7 +108,7 @@ export default class DdsImage {
    * 
    * @param image Jimp image to load as DdsImage
    */
-  static async fromJimpAsync(image: Jimp): Promise<DdsImage> {
+  static async fromJimpAsync(image: JimpType): Promise<DdsImage> {
     return new Promise(async (resolve, reject) => {
       const submittedWidth = image.bitmap.width;
       const submittedHeight = image.bitmap.height;
@@ -129,6 +126,7 @@ export default class DdsImage {
 
       while (currentWidth > 4 && currentHeight > 4 && mips <= 15) {
         if (currentWidth !== initialWidth || currentHeight !== initialHeight)
+          // @ts-expect-error Using resize plugin
           image.resize(currentWidth, currentHeight);
 
         compressedBuffers.push(
@@ -181,7 +179,7 @@ export default class DdsImage {
    * using either DXT or DST compression, or an exception is thrown.
    */
   toBitmap(): Bitmap {
-    const dds = this.isShuffled ? this.toUnshuffled() : this;
+    const dds = this.toUnshuffled();
 
     // guaranteed to not be DST since dds gets unshuffled
     const compression = (() => {
@@ -211,10 +209,8 @@ export default class DdsImage {
 
   /**
    * Returns the data in this image as a Jimp object. The Jimp object can then
-   * be used to export the image to various other formats, including PNG, JPG,
-   * BMP, GIF, or TIFF. PNG is highly, highly recommended, as JPG and BMP will
-   * replace transparency with black pixels, and GIF and TIFF will most likely
-   * appear discolored and have seemingly random transparency.
+   * be used to export the image to another formats - currently, only PNG is
+   * officially supported.
    * 
    * ```ts
    * // Example of getting a buffer containing PNG data
@@ -224,26 +220,37 @@ export default class DdsImage {
    *   });
    * ```
    */
-  toJimp(): Jimp {
+  toJimp(): JimpType {
     return new Jimp(this.toBitmap());
   }
 
   /**
-   * Returns a deep copy of this image, guaranteed to use DST compression.
+   * Returns a deep copy of this image, guaranteed to use DST compression. If
+   * the image this is called on is not compressed or uses DXT3, an exception
+   * will be thrown.
+   * 
+   * @param clone If true, then a clone of this image will be returned if it is
+   * already shuffled. If false, this image itself will be returned. False by
+   * default.
    */
-  toShuffled(): DdsImage {
+  toShuffled(clone = false): DdsImage {
     return !this.isShuffled
       ? this._shuffle()
-      : this.clone();
+      : (clone ? this.clone() : this);
   }
 
   /**
-   * Returns a deep copy of this image, guaranteed to use DXT compression.
+   * Returns a deep copy of this image, guaranteed to use DST compression. If
+   * the image this is called on uses DST3, an exception will be thrown.
+   * 
+   * @param clone If true, then a clone of this image will be returned if it is
+   * already unshuffled. If false, this image itself will be returned. False by
+   * default.
    */
-  toUnshuffled(): DdsImage {
+  toUnshuffled(clone = false): DdsImage {
     return this.isShuffled
       ? this._unshuffle()
-      : this.clone();
+      : (clone ? this.clone() : this);
   }
 
   //#endregion Public Methods

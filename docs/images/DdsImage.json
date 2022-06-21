@@ -116,7 +116,7 @@
           "displayType": "function",
           "prefix": "static async",
           "name": "fromImageAsync",
-          "description": "Reads an image buffer and converts it to a DdsImage. Supported image types include PNG, TIFF, GIF, JPG*, and BMP*. Dimensions should be a power of 2 greater than 4; if not, they will be resized.\n\n* = JPG and BMP images are highly problematic. Neither allow transparency, and BMPs will likely result in distorted colors and shifted pixels. It's highly recommended that you use one of the other formats.",
+          "description": "Reads an image buffer and converts it to a DdsImage. The only supported image type is currently PNG. Dimensions should be a power of 2 greater than 4; if not, they will be resized.",
           "returnType": {
             "name": "Promise<DdsImage>"
           },
@@ -126,7 +126,7 @@
               "type": {
                 "name": "Buffer"
               },
-              "description": "Buffer containing the image in another format."
+              "description": "Buffer containing PNG image."
             }
           ]
         },
@@ -178,7 +178,7 @@
         {
           "displayType": "function",
           "name": "toJimp",
-          "description": "Returns the data in this image as a Jimp object. The Jimp object can then be used to export the image to various other formats, including PNG, JPG, BMP, GIF, or TIFF. PNG is highly, highly recommended, as JPG and BMP will replace transparency with black pixels, and GIF and TIFF will most likely appear discolored and have seemingly random transparency.",
+          "description": "Returns the data in this image as a Jimp object. The Jimp object can then be used to export the image to another formats - currently, only PNG is officially supported.",
           "returnType": {
             "name": "Jimp",
             "externalLink": "https://github.com/oliver-moran/jimp"
@@ -192,18 +192,38 @@
         {
           "displayType": "function",
           "name": "toShuffled",
-          "description": "Returns a deep copy of this image, guaranteed to use DST compression.",
+          "description": "Returns a deep copy of this image, guaranteed to use DST compression. If the image this is called on is not compressed or uses DXT3, an exception will be thrown.",
           "returnType": {
             "name": "DdsImage"
-          }
+          },
+          "arguments": [
+            {
+              "name": "clone",
+              "optional": true,
+              "description": "If true, then a clone of this image will be returned if it is already shuffled. If false, this image itself will be returned. False by default.",
+              "type": {
+                "name": "boolean"
+              }
+            }
+          ]
         },
         {
           "displayType": "function",
           "name": "toUnshuffled",
-          "description": "Returns a deep copy of this image, guaranteed to use DXT compression.",
+          "description": "Returns a deep copy of this image, guaranteed to use DST compression. If the image this is called on uses DST3, an exception will be thrown.",
           "returnType": {
             "name": "DdsImage"
-          }
+          },
+          "arguments": [
+            {
+              "name": "clone",
+              "optional": true,
+              "description": "If true, then a clone of this image will be returned if it is already unshuffled. If false, this image itself will be returned. False by default.",
+              "type": {
+                "name": "boolean"
+              }
+            }
+          ]
         }
       ]
     }
