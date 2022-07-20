@@ -13,6 +13,7 @@ import Jimp from "./jimp";
 import DdsHeader from "./dds-header";
 import { Bitmap } from "./types";
 import { findPowerOfTwo } from "./helpers";
+import { DdsConversionOptions } from "./options";
 
 try {
   var dxt = require("dxt-js");
@@ -83,10 +84,14 @@ export default class DdsImage {
    * 
    * @param bitmap Object containing byte-by-byte information about the image to
    * load as a DdsImage
+   * @param options Object of optional arguments
    */
-  static async fromBitmapAsync(bitmap: Bitmap): Promise<DdsImage> {
+  static async fromBitmapAsync(
+    bitmap: Bitmap,
+    options?: DdsConversionOptions
+  ): Promise<DdsImage> {
     return new Promise(async (resolve) => {
-      resolve(await this.fromJimpAsync(new Jimp(bitmap)));
+      resolve(await this.fromJimpAsync(new Jimp(bitmap), options));
     });
   }
 
@@ -96,10 +101,14 @@ export default class DdsImage {
    * 4; if not, they will be resized.
    * 
    * @param buffer Buffer containing PNG image
+   * @param options Object of optional arguments
    */
-  static async fromImageAsync(buffer: Buffer): Promise<DdsImage> {
+  static async fromImageAsync(
+    buffer: Buffer,
+    options?: DdsConversionOptions
+  ): Promise<DdsImage> {
     return new Promise(async (resolve) => {
-      resolve(this.fromJimpAsync(await Jimp.read(buffer)));
+      resolve(this.fromJimpAsync(await Jimp.read(buffer), options));
     });
   }
 
@@ -107,14 +116,19 @@ export default class DdsImage {
    * Creates a DdsImage from a Jimp image object.
    * 
    * @param image Jimp image to load as DdsImage
+   * @param options Object of optional arguments
    */
-  static async fromJimpAsync(image: JimpType): Promise<DdsImage> {
+  static async fromJimpAsync(
+    image: JimpType,
+    options?: DdsConversionOptions
+  ): Promise<DdsImage> {
     return new Promise(async (resolve, reject) => {
+      const maxMipMaps = Math.min(15, Math.max(1, options?.maxMipMaps ?? 15));
       const submittedWidth = image.bitmap.width;
       const submittedHeight = image.bitmap.height;
 
-      if (submittedWidth < 4 || submittedHeight < 4)
-        reject("Dimensions must be >= 4.");
+      if (submittedWidth <= 4 || submittedHeight <= 4)
+        return reject("Dimensions must be > 4.");
 
       const initialWidth = findPowerOfTwo(submittedWidth);
       const initialHeight = findPowerOfTwo(submittedHeight);
@@ -124,7 +138,7 @@ export default class DdsImage {
       let currentWidth = initialWidth;
       let currentHeight = initialHeight;
 
-      while (currentWidth > 4 && currentHeight > 4 && mips <= 15) {
+      while (currentWidth > 4 && currentHeight > 4 && mips <= maxMipMaps) {
         if (currentWidth !== initialWidth || currentHeight !== initialHeight)
           // @ts-expect-error Using resize plugin
           image.resize(currentWidth, currentHeight);
@@ -153,7 +167,8 @@ export default class DdsImage {
 
       const dds = DdsImage._fromDdsData(
         header,
-        Buffer.concat(compressedBuffers)
+        Buffer.concat(compressedBuffers),
+        options
       );
 
       resolve(dds);
@@ -265,13 +280,21 @@ export default class DdsImage {
    * 
    * @param header Header of DDS image being created
    * @param ddsData Actual DDS image data
+   * @param options Object of optional arguments
    */
-  private static _fromDdsData(header: DdsHeader, ddsData: Buffer): DdsImage {
+  private static _fromDdsData(
+    header: DdsHeader,
+    ddsData: Buffer,
+    options?: DdsConversionOptions
+  ): DdsImage {
     const encoder = BinaryEncoder.alloc(4 + header.size + ddsData.length);
     encoder.uint32(DdsImage.SIGNATURE);
     header.serialize(encoder);
     encoder.bytes(ddsData);
-    return new DdsImage(header, encoder.buffer);
+    const dds = new DdsImage(header, encoder.buffer);
+    return options?.shuffle
+      ? dds.toShuffled()
+      : dds.toUnshuffled();
   }
 
   /**
