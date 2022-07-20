@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.1] - 2022/07/20
 ### Added
 - Add `DdsConversionOptions` to make mipmaps and shuffling configurable.
+### Changed
+- Minimum image width and height are now 8 pixels.
 ### Fixed
-- DDS conversions from an image with width or height of 4 pixels will no longer cause an error.
 - Add `Bitmap` interface to documentation index.
 
 ## [0.2.0] - 2022/06/21
