@@ -109,6 +109,19 @@
                 }
               },
               "description": "Object containing byte-by-byte information about the image to load as a DdsImage."
+            },
+            {
+              "name": "options",
+              "optional": true,
+              "description": "Object of optional arguments.",
+              "type": {
+                "name": "DdsConversionOptions",
+                "path": {
+                  "pkg": "images",
+                  "group": "types",
+                  "item": "DdsConversionOptions"
+                }
+              }
             }
           ]
         },
@@ -127,6 +140,19 @@
                 "name": "Buffer"
               },
               "description": "Buffer containing PNG image."
+            },
+            {
+              "name": "options",
+              "optional": true,
+              "description": "Object of optional arguments.",
+              "type": {
+                "name": "DdsConversionOptions",
+                "path": {
+                  "pkg": "images",
+                  "group": "types",
+                  "item": "DdsConversionOptions"
+                }
+              }
             }
           ]
         },
@@ -146,6 +172,19 @@
                 "externalLink": "https://github.com/oliver-moran/jimp"
               },
               "description": "Jimp image to load as DdsImage."
+            },
+            {
+              "name": "options",
+              "optional": true,
+              "description": "Object of optional arguments.",
+              "type": {
+                "name": "DdsConversionOptions",
+                "path": {
+                  "pkg": "images",
+                  "group": "types",
+                  "item": "DdsConversionOptions"
+                }
+              }
             }
           ]
         }
