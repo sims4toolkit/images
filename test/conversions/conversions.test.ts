@@ -31,12 +31,22 @@ const otherFileExtensions = [
 */
 
 otherFileExtensions.forEach(ext => {
+  // LB images
   const srcPath = path.join(srcDir, `LB.${ext}`);
-  const outPath = path.join(outDir, `import-${ext}.dds`);
+  const outPath = path.join(outDir, `import-LB-${ext}.dds`);
   const buffer = fs.readFileSync(srcPath);
   DdsImage.fromImageAsync(buffer)
     .then(dds => {
       fs.writeFileSync(outPath, dds.buffer);
+    });
+
+  // Other images
+  const otherSrcPath = path.join(srcDir, `FortyByForty.${ext}`);
+  const otherOutPath = path.join(outDir, `import-FortyByForty-${ext}.dds`);
+  const otherBuffer = fs.readFileSync(otherSrcPath);
+  DdsImage.fromImageAsync(otherBuffer)
+    .then(dds => {
+      fs.writeFileSync(otherOutPath, dds.buffer);
     });
 });
 
