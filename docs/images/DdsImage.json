@@ -129,7 +129,7 @@
           "displayType": "function",
           "prefix": "static async",
           "name": "fromImageAsync",
-          "description": "Reads an image buffer and converts it to a DdsImage. The only supported image type is currently PNG. Dimensions should be a power of 2 greater than 4; if not, they will be resized.",
+          "description": "Reads an image buffer and converts it to a DdsImage. The only supported image type is currently PNG.",
           "returnType": {
             "name": "Promise<DdsImage>"
           },

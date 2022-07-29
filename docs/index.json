@@ -1,13 +1,14 @@
 {
   "$schema": "https://raw.githubusercontent.com/sims4toolkit/misc/main/json-schemas/docs-index-schema.json",
   "versions": [
+    "0.2.2",
     "0.2.1",
     "0.2.0",
     "0.1.0"
   ],
   "notice": {
     "type": "experimental",
-    "text": "This package is experimental. I cannot guarantee that conversions between image formats is going to go smoothly. For best results, ensure that your images are a power of 2 before converting."
+    "text": "This package is experimental - I cannot guarantee that conversions between image formats is going to go smoothly. If you run into problems, please report them to me."
   },
   "groups": [
     {

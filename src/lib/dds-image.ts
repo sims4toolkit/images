@@ -11,9 +11,7 @@ import { BinaryDecoder, BinaryEncoder } from "@s4tk/encoding";
 import { FourCC, HeaderFlags } from "./enums";
 import Jimp from "./jimp";
 import DdsHeader from "./dds-header";
-import { Bitmap } from "./types";
-import { findPowerOfTwo } from "./helpers";
-import { DdsConversionOptions } from "./options";
+import { Bitmap, DdsConversionOptions } from "./types";
 
 try {
   var dxt = require("dxt-js");
@@ -124,21 +122,19 @@ export default class DdsImage {
   ): Promise<DdsImage> {
     return new Promise(async (resolve, reject) => {
       const maxMipMaps = Math.min(15, Math.max(1, options?.maxMipMaps ?? 15));
-      const submittedWidth = image.bitmap.width;
-      const submittedHeight = image.bitmap.height;
+      const initialWidth = image.bitmap.width;
+      const initialHeight = image.bitmap.height;
 
-      if (submittedWidth <= 4 || submittedHeight <= 4)
-        return reject("Dimensions must be > 4.");
+      if (initialWidth < 4 || initialHeight < 4)
+        return reject("Dimensions must be >= 4.");
 
-      const initialWidth = findPowerOfTwo(submittedWidth);
-      const initialHeight = findPowerOfTwo(submittedHeight);
       const compressedBuffers: Buffer[] = [];
 
-      let mips = 1;
+      let mips = 0;
       let currentWidth = initialWidth;
       let currentHeight = initialHeight;
 
-      while (currentWidth > 4 && currentHeight > 4 && mips <= maxMipMaps) {
+      while (currentWidth >= 4 && currentHeight >= 4 && mips < maxMipMaps) {
         if (currentWidth !== initialWidth || currentHeight !== initialHeight)
           // @ts-expect-error Using resize plugin
           image.resize(currentWidth, currentHeight);
@@ -152,9 +148,14 @@ export default class DdsImage {
           )
         );
 
-        currentWidth /= 2;
-        currentHeight /= 2;
         mips++;
+
+        if ((currentWidth % 2 === 0) && (currentHeight % 2 === 0)) {
+          currentWidth /= 2;
+          currentHeight /= 2;
+        } else {
+          break;
+        }
       }
 
       const header = new DdsHeader({
@@ -162,7 +163,7 @@ export default class DdsImage {
         height: initialHeight,
         headerFlags: HeaderFlags.Texture | HeaderFlags.Mipmap,
         surfaceFlags: 0x00401008,
-        mipCount: mips - 1,
+        mipCount: mips,
       });
 
       const dds = DdsImage._fromDdsData(
