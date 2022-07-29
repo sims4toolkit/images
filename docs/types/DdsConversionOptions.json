@@ -6,7 +6,7 @@
       "name": "DdsConversionOptions"
     },
     "description": "Optional arguments to provide when creating a DDS image from another format.",
-    "sourceCode": "src/lib/options.ts"
+    "sourceCode": "src/lib/types.ts"
   },
   "sections": [
     {
