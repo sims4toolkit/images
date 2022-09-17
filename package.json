@@ -1,6 +1,6 @@
 {
   "name": "@s4tk/images",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Models and algorithms for processing image resources.",
   "repository": {
     "type": "git",
@@ -34,6 +34,6 @@
     "@jimp/plugin-resize": "^0.16.1",
     "@jimp/png": "^0.16.1",
     "@s4tk/encoding": "^0.1.4",
-    "dxt-js": "^0.0.3"
+    "silent-dxt-js": "^0.0.3"
   }
 }
