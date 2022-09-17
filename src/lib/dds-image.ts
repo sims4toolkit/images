@@ -12,13 +12,7 @@ import { FourCC, HeaderFlags } from "./enums";
 import Jimp from "./jimp";
 import DdsHeader from "./dds-header";
 import { Bitmap, DdsConversionOptions } from "./types";
-
-try {
-  var dxt = require("dxt-js");
-} catch (err) {
-  var dxt;
-  console.warn("DXT compression not supported in this environment.", err);
-}
+import dxt from "silent-dxt-js";
 
 /**
  * Model for DDS images, which may be in DXT (unshuffled) or DST (shuffled)
