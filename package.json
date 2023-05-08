@@ -1,6 +1,6 @@
 {
   "name": "@s4tk/images",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Models and algorithms for processing image resources.",
   "repository": {
     "type": "git",
@@ -29,10 +29,10 @@
     "@types/node": "^17.0.41"
   },
   "dependencies": {
-    "@jimp/core": "^0.16.1",
-    "@jimp/custom": "^0.16.1",
-    "@jimp/plugin-resize": "^0.16.1",
-    "@jimp/png": "^0.16.1",
+    "@jimp/core": "^0.22.7",
+    "@jimp/custom": "^0.22.7",
+    "@jimp/plugin-resize": "^0.22.7",
+    "@jimp/png": "^0.22.7",
     "@s4tk/encoding": "^0.1.4",
     "silent-dxt-js": "^0.0.3"
   }
